@@ -96,8 +96,8 @@ class WPCTC_Widget extends WP_Widget
     public function form($instance)
     {
         $title = isset($instance['title']) ? $instance['title'] : __('New title', 'wpctc_widget_domain');
-        $category_id = isset($instance['category_id']) ? $instance['category_id'] : [];
-        $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : [];
+        $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
+        $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) ? $instance['order'] : 'ASC';
         $format = isset($instance['format']) ? $instance['format'] : 'flat';

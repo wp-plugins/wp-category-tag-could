@@ -1,10 +1,10 @@
-=== WP Category Tag Could ===
+=== WP Category Tag Cloud ===
 Contributors: benohead
 Donate link: http://benohead.com/donate/
 Tags: cat, category, cloud, configurable, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.2
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,7 @@ You can also choose to only consider posts with specific categories or tags.
 
 == Installation ==
 
-1. Upload the folder `wp-category-tag-cloud` to the `/wp-content/plugins/`
+1. Upload the folder `wp-category-tag-could` to the `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Select the widget and configure it
 
@@ -40,6 +40,10 @@ Send an email to henri.benoit@gmail.com
 1. Widget configuration
 
 == Changelog ==
+
+= 0.2.1 =
+
+* Fixed bug when run with PHP 5.3 or lower
 
 = 0.2 =
 

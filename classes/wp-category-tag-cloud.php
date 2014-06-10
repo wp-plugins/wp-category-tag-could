@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.2';
+        const VERSION = '0.2.1';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 

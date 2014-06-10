@@ -182,7 +182,7 @@ if (!class_exists('WPCTC_Settings')) {
          */
         public function add_plugin_action_links($links)
         {
-            array_unshift($links, '<a href="http://wordpress.org/extend/plugins/wp-category-tag-cloud/faq/">Help</a>');
+            array_unshift($links, '<a href="http://wordpress.org/extend/plugins/wp-category-tag-could/faq/">Help</a>');
             array_unshift($links, '<a href="options-general.php?page=wpctc_settings">Settings</a>');
             return $links;
         }
