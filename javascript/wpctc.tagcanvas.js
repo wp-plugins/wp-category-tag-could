@@ -16,21 +16,25 @@ function wpctcWrapper($) {
             wpctc.templateURL = $('#template-url').val();
             wpctc.ajaxPostURL = $('#ajax-post-url').val();
             wpctc.registerEventHandlers();
-            $('.tagcloud-canvas').each(function() {
+            $('.tagcloud-canvas').each(function () {
                 $(this).tagcanvas({
                     outlineThickness: 0,
                     textFont: null,
                     textColour: null,
-                    maxSpeed : 0.06,
-                    minBrightness : 0.1,
-                    depth : 0.95,
-                    pulsateTo : 0.2,
-                    pulsateTime : 0.75,
-                    decel : 0.9,
-                    reverse : true,
-                    fadeIn : 800,
+                    maxSpeed: 0.06,
+                    minBrightness: 0.1,
+                    depth: 0.95,
+                    pulsateTo: 0.2,
+                    pulsateTime: 0.75,
+                    decel: 0.9,
+                    reverse: true,
+                    fadeIn: 800,
+                    zoom: parseInt($(this).attr("data-cloud-zoom")),
+                    zoomStep: 0.05,
+                    zoomMax: 3.0,
+                    zoomMin: 0.3,
                     weight: true
-                }, $(this).attr('id')+'_tags');
+                }, $(this).attr('id') + '_tags');
             });
         },
         /**

@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.2.1';
+        const VERSION = '0.3';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 
@@ -63,7 +63,27 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
                 true
             );
 
-            if (!is_admin()) {
+            wp_register_script(
+                self::PREFIX . 'wp-category-tag-cloud-admin',
+                plugins_url('javascript/wp-category-tag-cloud-admin.js', dirname(__FILE__)),
+                array('jquery'),
+                self::VERSION,
+                true
+            );
+
+
+            wp_register_style(
+                self::PREFIX . 'wpctc',
+                plugins_url('css/wpctc.css', dirname(__FILE__)),
+                array(),
+                self::VERSION,
+                'all'
+            );
+
+            if (is_admin()) {
+                wp_enqueue_script(self::PREFIX . 'wp-category-tag-cloud-admin');
+            } else {
+                wp_enqueue_style(self::PREFIX . 'wpctc');
                 wp_enqueue_script(self::PREFIX . 'jquery-tagcanvas');
                 wp_enqueue_script(self::PREFIX . 'wpctc-tagcanvas');
             }

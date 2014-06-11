@@ -52,11 +52,11 @@ class WPCTC_Widget extends WP_Widget
             }
         }
         $cloud_args = array(
-            'smallest' => $instance['smallest'],
-            'largest' => $instance['largest'],
+            'smallest' => $instance['format'] == 'price' ? '100' : $instance['smallest'],
+            'largest' => $instance['format'] == 'price' ? '100' : $instance['largest'],
             'unit' => '%',
             'number' => $instance['number'],
-            'format' => $instance['format'],
+            'format' => $instance['format'] == 'price' ? 'flat' : $instance['format'],
             'orderby' => $instance['order_by'],
             'order' => $instance['order'],
             'include' => null,
@@ -69,14 +69,15 @@ class WPCTC_Widget extends WP_Widget
             $cloud_args['include'] = $includeTags;
         }
         ?>
-        <div id="tagcloud">
+        <div id="tagcloud" <?php if ($instance['format'] == 'price') echo " class='wpctc-tag-links' "; ?>>
             <?php
             if ($instance['format'] != 'array') {
                 wp_tag_cloud($cloud_args);
             } else {
                 $tags = wp_tag_cloud($cloud_args);
                 ?>
-                <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas">
+                <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
+                        data-cloud-zoom=<?php echo $instance['zoom']; ?>>
                 </canvas>
             <?php
             }
@@ -103,6 +104,7 @@ class WPCTC_Widget extends WP_Widget
         $format = isset($instance['format']) ? $instance['format'] : 'flat';
         $number = isset($instance['number']) ? $instance['number'] : '0';
         $taxonomy = isset($instance['taxonomy']) ? $instance['taxonomy'] : 'post_tag';
+        $zoom = isset($instance['zoom']) ? $instance['zoom'] : '1';
         $smallest = isset($instance['smallest']) ? $instance['smallest'] : '75';
         $largest = isset($instance['largest']) ? $instance['largest'] : '200';
         ?>
@@ -214,26 +216,33 @@ class WPCTC_Widget extends WP_Widget
         <p>
             <label for="<?php echo $this->get_field_id('format'); ?>"><?php _e('Format:'); ?></label><br/>
             <select id="<?php echo $this->get_field_id('format'); ?>"
-                    name="<?php echo $this->get_field_name('format'); ?>" class="widefat">
-                <?php
-                $taxonomies = array('flat' => __('Separated by whitespace'), 'list' => __('UL with a class of wp-tag-cloud'), 'array' => __('3D HTML5 Cloud'));
-                foreach ($taxonomies as $field_id => $field_name) {
-                    ?>
-                    <option
-                        value="<?php echo($field_id); ?>" <?php selected($field_id, $format); ?>><?php echo $field_name; ?></option>
-                <?php
-                }
+                    name="<?php echo $this->get_field_name('format'); ?>" class="widefat cloud-type-selector">
+            <?php
+            $taxonomies = array('flat' => __('Separated by whitespace'), 'price' => __('Price tags'), 'list' => __('UL with a class of wp-tag-cloud'), 'array' => __('3D HTML5 Cloud'));
+            foreach ($taxonomies as $field_id => $field_name) {
                 ?>
+                <option
+                    value="<?php echo($field_id); ?>" <?php selected($field_id, $format); ?>><?php echo $field_name; ?></option>
+            <?php
+            }
+            ?>
             </select>
         </p>
-        <p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('zoom'); ?>"><?php _e('Initial zoom factor:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('zoom'); ?>"
+                   name="<?php echo $this->get_field_name('zoom'); ?>" type="text"
+                   value="<?php echo esc_attr($zoom); ?>"/>
+        </p>
+        <p class="cloud-non-price">
             <label
                 for="<?php echo $this->get_field_id('smallest'); ?>"><?php _e('Size of the smallest item (in %):'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('smallest'); ?>"
                    name="<?php echo $this->get_field_name('smallest'); ?>" type="text"
                    value="<?php echo esc_attr($smallest); ?>"/>
         </p>
-        <p>
+        <p class="cloud-non-price">
             <label
                 for="<?php echo $this->get_field_id('largest'); ?>"><?php _e('Size of the largest item (in %):'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('largest'); ?>"
@@ -255,6 +264,7 @@ class WPCTC_Widget extends WP_Widget
         $instance['format'] = isset($new_instance['format']) && strlen($new_instance['format']) > 0 ? $new_instance['format'] : 'flat';
         $instance['number'] = isset($new_instance['number']) && (is_int($new_instance['number']) || ctype_digit($new_instance['number'])) ? $new_instance['number'] : 0;
         $instance['taxonomy'] = isset($new_instance['taxonomy']) && strlen($new_instance['taxonomy']) > 0 ? $new_instance['taxonomy'] : 'post_tag';
+        $instance['zoom'] = isset($new_instance['zoom']) && is_numeric($new_instance['zoom']) ? $new_instance['zoom'] : 1;
         $instance['smallest'] = isset($new_instance['smallest']) && (is_int($new_instance['smallest']) || ctype_digit($new_instance['smallest'])) ? $new_instance['smallest'] : 75;
         $instance['largest'] = isset($new_instance['largest']) && (is_int($new_instance['largest']) || ctype_digit($new_instance['largest'])) ? $new_instance['largest'] : 200;
         return $instance;

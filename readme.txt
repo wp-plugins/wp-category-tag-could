@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: cat, category, cloud, configurable, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.2.1
+Stable tag: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,8 @@ You configure:
 * the maximum number of taxonomy terms displayed
 * whether the entries in the cloud are ordered by name or post count
 * whether the entries are sorted in an ascending, descending or random order
-* whether the cloud is rendered as a flat list separated by spaces, as a UL tag with the wp-tag-cloud class or as a 3D HTML5 based tag cloud.
+* whether the cloud is rendered as a flat list separated by spaces, as a UL tag with the wp-tag-cloud class, price tags or as a 3D HTML5 based tag cloud.
+* the zoom factor in case of a 3D HTML5 based tag cloud
 * the size of the smallest and largest items in the cloud (in percentage)
 
 You can also choose to only consider posts with specific categories or tags.
@@ -39,7 +40,20 @@ Send an email to henri.benoit@gmail.com
 
 1. Widget configuration
 
+2. 3D HTML5 cloud
+
+3. Flat list
+
+4. Price tags
+
 == Changelog ==
+
+= 0.3 =
+
+* Added configuration setting for zoom factor in 3D HTML5 canvas
+* Add support for price tags
+* Add support for configuration settings based on the selected cloud type
+* Updated screenshots in readme
 
 = 0.2.1 =
 
