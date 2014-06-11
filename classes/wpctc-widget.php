@@ -96,17 +96,18 @@ class WPCTC_Widget extends WP_Widget
 
     public function form($instance)
     {
-        $title = isset($instance['title']) ? $instance['title'] : __('New title', 'wpctc_widget_domain');
-        $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
-        $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
-        $order_by = isset($instance['order_by']) ? $instance['order_by'] : 'name';
-        $order = isset($instance['order']) ? $instance['order'] : 'ASC';
-        $format = isset($instance['format']) ? $instance['format'] : 'flat';
-        $number = isset($instance['number']) ? $instance['number'] : '0';
-        $taxonomy = isset($instance['taxonomy']) ? $instance['taxonomy'] : 'post_tag';
-        $zoom = isset($instance['zoom']) ? $instance['zoom'] : '1';
-        $smallest = isset($instance['smallest']) ? $instance['smallest'] : '75';
-        $largest = isset($instance['largest']) ? $instance['largest'] : '200';
+        $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
+        $category_id = $instance['category_id'];
+        $tag_id = $instance['tag_id'];
+        $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
+        $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
+        $format = isset($instance['format']) && strlen($instance['format']) > 0 ? $instance['format'] : 'flat';
+        $number = isset($instance['number']) && (is_int($instance['number']) || ctype_digit($instance['number'])) ? $instance['number'] : 0;
+        $taxonomy = isset($instance['taxonomy']) && strlen($instance['taxonomy']) > 0 ? $instance['taxonomy'] : 'post_tag';
+        $zoom = isset($instance['zoom']) && is_numeric($instance['zoom']) ? $instance['zoom'] : 1;
+        $smallest = isset($instance['smallest']) && (is_int($instance['smallest']) || ctype_digit($instance['smallest'])) ? $instance['smallest'] : 75;
+        $largest = isset($instance['largest']) && (is_int($instance['largest']) || ctype_digit($instance['largest'])) ? $instance['largest'] : 200;
+
         ?>
         <p>
             <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
@@ -217,15 +218,15 @@ class WPCTC_Widget extends WP_Widget
             <label for="<?php echo $this->get_field_id('format'); ?>"><?php _e('Format:'); ?></label><br/>
             <select id="<?php echo $this->get_field_id('format'); ?>"
                     name="<?php echo $this->get_field_name('format'); ?>" class="widefat cloud-type-selector">
-            <?php
-            $taxonomies = array('flat' => __('Separated by whitespace'), 'price' => __('Price tags'), 'list' => __('UL with a class of wp-tag-cloud'), 'array' => __('3D HTML5 Cloud'));
-            foreach ($taxonomies as $field_id => $field_name) {
+                <?php
+                $taxonomies = array('flat' => __('Separated by whitespace'), 'price' => __('Price tags'), 'list' => __('UL with a class of wp-tag-cloud'), 'array' => __('3D HTML5 Cloud'));
+                foreach ($taxonomies as $field_id => $field_name) {
+                    ?>
+                    <option
+                        value="<?php echo($field_id); ?>" <?php selected($field_id, $format); ?>><?php echo $field_name; ?></option>
+                <?php
+                }
                 ?>
-                <option
-                    value="<?php echo($field_id); ?>" <?php selected($field_id, $format); ?>><?php echo $field_name; ?></option>
-            <?php
-            }
-            ?>
             </select>
         </p>
         <p class="canvas-config">
@@ -256,7 +257,7 @@ class WPCTC_Widget extends WP_Widget
     function update($new_instance, $old_instance)
     {
         $instance = array();
-        $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '';
+        $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
         $instance['category_id'] = $new_instance['category_id'];
         $instance['tag_id'] = $new_instance['tag_id'];
         $instance['order_by'] = isset($new_instance['order_by']) && strlen($new_instance['order_by']) > 0 ? $new_instance['order_by'] : 'name';
