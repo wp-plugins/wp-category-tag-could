@@ -79,9 +79,6 @@ class WPCTC_Widget extends WP_Widget
                 <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
                         data-cloud-zoom=<?php echo $instance['zoom']; ?>>
                 </canvas>
-            <?php
-            }
-            ?>
         </div>
         <div id="<?php echo $args['widget_id']; ?>_canvas_tags">
             <ul>
@@ -89,6 +86,9 @@ class WPCTC_Widget extends WP_Widget
                     <li><?php echo($tag); ?></li>
                 <?php } ?>
             </ul>
+            <?php
+            }
+        ?>
         </div>
         <?php
         echo $args['after_widget'];
@@ -97,8 +97,8 @@ class WPCTC_Widget extends WP_Widget
     public function form($instance)
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
-        $category_id = $instance['category_id'];
-        $tag_id = $instance['tag_id'];
+        $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
+        $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
         $format = isset($instance['format']) && strlen($instance['format']) > 0 ? $instance['format'] : 'flat';

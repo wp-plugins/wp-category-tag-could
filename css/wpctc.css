@@ -47,3 +47,6 @@
     top: 8px;
     width: 4px;
 }
+canvas.tagcloud-canvas {
+    width: 100%;
+}

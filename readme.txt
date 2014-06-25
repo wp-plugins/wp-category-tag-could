@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: cat, category, cloud, configurable, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,11 @@ Send an email to henri.benoit@gmail.com
 4. Price tags
 
 == Changelog ==
+
+= 0.3.2 =
+
+* Fixed errors in comboboxes on empty values
+* Made canvas width 100%
 
 = 0.3.1 =
 
