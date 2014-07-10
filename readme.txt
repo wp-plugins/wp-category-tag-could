@@ -1,5 +1,5 @@
 === WP Category Tag Cloud ===
-Contributors: benohead
+Contributors: benohead, amazingweb-gmbh
 Donate link: http://benohead.com/donate/
 Tags: cat, category, cloud, configurable, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
