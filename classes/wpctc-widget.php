@@ -18,6 +18,40 @@ class WPCTC_Widget extends WP_Widget
         );
     }
 
+    private function get_child_categories($cat_id)
+    {
+        $args = array(
+            'type' => 'post',
+            'child_of' => $cat_id,
+            'orderby' => 'name',
+            'order' => 'ASC',
+            'hide_empty' => FALSE,
+            'hierarchical' => 1,
+            'taxonomy' => 'category',
+        );
+        $child_categories = get_categories($args);
+
+        $category_list = array();
+
+        if (!empty ($child_categories)) {
+            foreach ($child_categories as $child_category) {
+                $category_list[] = $child_category->term_id;
+            }
+        }
+
+        return $category_list;
+    }
+
+    private function get_child_categories_list($categories)
+    {
+        $category_list = array();
+        foreach ($categories as $cat_id) {
+            $category_list[] = $cat_id;
+            $category_list = array_merge($category_list, $this->get_child_categories($cat_id));
+        }
+        return $category_list;
+    }
+
     public function widget($args, $instance)
     {
         global $wpdb;
@@ -27,23 +61,28 @@ class WPCTC_Widget extends WP_Widget
         if (!empty($title))
             echo $args['before_title'] . $title . $args['after_title'];
 
+        if (isset($instance['child_categories']) && $instance['child_categories'] === "1" && isset($instance['category_id']) && count($instance['category_id']) > 0) {
+            $instance['category_id'] = $this->get_child_categories_list($instance['category_id']);
+        }
+
         $tags = $wpdb->get_results
             ("
 			SELECT DISTINCT tt2.term_id AS tag_id
-			FROM wp_posts as posts
-				INNER JOIN wp_term_relationships as tr1 ON posts.ID = tr1.object_ID
-				INNER JOIN wp_term_taxonomy as tt1 ON tr1.term_taxonomy_id = tt1.term_taxonomy_id
-				INNER JOIN wp_term_relationships as tr2 ON posts.ID = tr2.object_ID
-				INNER JOIN wp_term_taxonomy as tt2 ON tr2.term_taxonomy_id = tt2.term_taxonomy_id
-				INNER JOIN wp_term_relationships as tr3 ON posts.ID = tr3.object_ID
-				INNER JOIN wp_term_taxonomy as tt3 ON tr3.term_taxonomy_id = tt3.term_taxonomy_id
+			FROM $wpdb->posts as posts
+				INNER JOIN $wpdb->term_relationships as tr1 ON posts.ID = tr1.object_ID
+				INNER JOIN $wpdb->term_taxonomy as tt1 ON tr1.term_taxonomy_id = tt1.term_taxonomy_id
+				INNER JOIN $wpdb->term_relationships as tr2 ON posts.ID = tr2.object_ID
+				INNER JOIN $wpdb->term_taxonomy as tt2 ON tr2.term_taxonomy_id = tt2.term_taxonomy_id
+				INNER JOIN $wpdb->term_relationships as tr3 ON posts.ID = tr3.object_ID
+				INNER JOIN $wpdb->term_taxonomy as tt3 ON tr3.term_taxonomy_id = tt3.term_taxonomy_id
 			WHERE posts.post_status = 'publish'
                 AND tt1.taxonomy = 'category'" .
-                (isset($instance['category_id']) && count($instance['category_id']) > 0 ? "AND tt1.term_id IN (" . implode(",", $instance['category_id']) . ")" : "") . "
+                (isset($instance['category_id']) && count($instance['category_id']) > 0 ? " AND tt1.term_id IN (" . implode(",", $instance['category_id']) . ")" : "") . "
                 AND tt2.taxonomy = '" . $instance['taxonomy'] . "'
                 AND tt3.taxonomy = 'post_tag'" .
-                (isset($instance['tag_id']) && count($instance['tag_id']) > 0 ? "AND tt3.term_id IN (" . implode(",", $instance['tag_id']) . ")" : "") . "
+                (isset($instance['tag_id']) && count($instance['tag_id']) > 0 ? " AND tt3.term_id IN (" . implode(",", $instance['tag_id']) . ")" : "") . "
         ");
+
         $includeTags = '';
         if (count($tags) > 0) {
             foreach ($tags as $tag) {
@@ -69,25 +108,25 @@ class WPCTC_Widget extends WP_Widget
             $cloud_args['include'] = $includeTags;
         }
         ?>
-        <div id="tagcloud" <?php if ($instance['format'] == 'price') echo " class='wpctc-tag-links' "; ?>>
-            <?php
-            if ($instance['format'] != 'array') {
-                wp_tag_cloud($cloud_args);
-            } else {
-                $tags = wp_tag_cloud($cloud_args);
-                ?>
-                <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
-                        data-cloud-zoom=<?php echo $instance['zoom']; ?>>
-                </canvas>
-        </div>
-        <div id="<?php echo $args['widget_id']; ?>_canvas_tags">
+    <div id="tagcloud" <?php if ($instance['format'] == 'price') echo " class='wpctc-tag-links' "; ?>>
+        <?php
+        if ($instance['format'] != 'array') {
+            wp_tag_cloud($cloud_args);
+        } else {
+            $tags = wp_tag_cloud($cloud_args);
+            ?>
+            <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
+                    data-cloud-zoom=<?php echo $instance['zoom']; ?>>
+            </canvas>
+            </div>
+            <div id="<?php echo $args['widget_id']; ?>_canvas_tags">
             <ul>
                 <?php foreach ($tags as $tag) { ?>
                     <li><?php echo($tag); ?></li>
                 <?php } ?>
             </ul>
-            <?php
-            }
+        <?php
+        }
         ?>
         </div>
         <?php
@@ -98,6 +137,7 @@ class WPCTC_Widget extends WP_Widget
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
+        $child_categories = isset($instance['child_categories']) ? $instance['child_categories'] : "0";
         $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
@@ -160,6 +200,16 @@ class WPCTC_Widget extends WP_Widget
                 }
                 ?>
             </select>
+        </p>
+        <p>
+            <label
+                for="<?php echo $this->get_field_id('child_categories'); ?>"><?php _e('Include children:'); ?></label>
+            <input id="<?php echo $this->get_field_id('child_categories'); ?>"
+                   name="<?php echo $this->get_field_name('child_categories'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($child_categories, "1"); ?>>
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('tag_id'); ?>"><?php _e('Tags:'); ?></label><br/>
@@ -259,6 +309,7 @@ class WPCTC_Widget extends WP_Widget
         $instance = array();
         $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
         $instance['category_id'] = $new_instance['category_id'];
+        $instance['child_categories'] = $new_instance['child_categories'];
         $instance['tag_id'] = $new_instance['tag_id'];
         $instance['order_by'] = isset($new_instance['order_by']) && strlen($new_instance['order_by']) > 0 ? $new_instance['order_by'] : 'name';
         $instance['order'] = isset($new_instance['order']) && strlen($new_instance['order']) > 0 ? $new_instance['order'] : 'ASC';
