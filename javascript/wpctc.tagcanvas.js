@@ -17,10 +17,11 @@ function wpctcWrapper($) {
             wpctc.ajaxPostURL = $('#ajax-post-url').val();
             wpctc.registerEventHandlers();
             $('.tagcloud-canvas').each(function () {
+                $color = $(this).attr('data-tagcloud-color');
                 $(this).tagcanvas({
                     outlineThickness: 0,
                     textFont: null,
-                    textColour: null,
+                    textColour: $color,
                     maxSpeed: 0.06,
                     minBrightness: 0.1,
                     depth: 0.95,

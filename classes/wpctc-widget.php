@@ -108,7 +108,8 @@ class WPCTC_Widget extends WP_Widget
             $cloud_args['include'] = $includeTags;
         }
         ?>
-    <div id="tagcloud" <?php if ($instance['format'] == 'price') echo " class='wpctc-tag-links' "; ?>>
+    <div
+        id="tagcloud" <?php echo ($instance['format'] == 'price') ? " class='wpctc-" . $args['widget_id'] . " wpctc-tag-links' " : " class='wpctc-" . $args['widget_id'] . "' "; ?>>
         <?php
         if ($instance['format'] != 'array') {
             wp_tag_cloud($cloud_args);
@@ -116,6 +117,7 @@ class WPCTC_Widget extends WP_Widget
             $tags = wp_tag_cloud($cloud_args);
             ?>
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
+                    data-tagcloud-color="<?php echo $instance['color']; ?>"
                     data-cloud-zoom=<?php echo $instance['zoom']; ?>>
             </canvas>
             </div>
@@ -130,6 +132,16 @@ class WPCTC_Widget extends WP_Widget
         ?>
         </div>
         <?php
+        if (isset($instance['color']) && !empty($instance['color'])) {
+            ?>
+            <style type="text/css">
+                <?php echo ".wpctc-".$args['widget_id']; ?>
+                a {
+                    color: <?php echo $instance['color']; ?> !important;
+                }
+            </style>
+        <?php
+        }
         echo $args['after_widget'];
     }
 
@@ -147,7 +159,10 @@ class WPCTC_Widget extends WP_Widget
         $zoom = isset($instance['zoom']) && is_numeric($instance['zoom']) ? $instance['zoom'] : 1;
         $smallest = isset($instance['smallest']) && (is_int($instance['smallest']) || ctype_digit($instance['smallest'])) ? $instance['smallest'] : 75;
         $largest = isset($instance['largest']) && (is_int($instance['largest']) || ctype_digit($instance['largest'])) ? $instance['largest'] : 200;
-
+        $color = (!empty($instance['color'])) ? strip_tags($instance['color']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color)) {
+            $color = '';
+        }
         ?>
         <p>
             <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
@@ -300,6 +315,14 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('largest'); ?>" type="text"
                    value="<?php echo esc_attr($largest); ?>"/>
         </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('color'); ?>"><?php _e('Font color:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('color'); ?>"
+                   name="<?php echo $this->get_field_name('color'); ?>" type="text"
+                   value="<?php echo esc_attr($color); ?>"/>
+            <small><em><?php _e('Leave empty to use the default theme color.'); ?></em></small>
+        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('color'); ?>"></div>
+        </p>
     <?php
     }
 
@@ -319,6 +342,11 @@ class WPCTC_Widget extends WP_Widget
         $instance['zoom'] = isset($new_instance['zoom']) && is_numeric($new_instance['zoom']) ? $new_instance['zoom'] : 1;
         $instance['smallest'] = isset($new_instance['smallest']) && (is_int($new_instance['smallest']) || ctype_digit($new_instance['smallest'])) ? $new_instance['smallest'] : 75;
         $instance['largest'] = isset($new_instance['largest']) && (is_int($new_instance['largest']) || ctype_digit($new_instance['largest'])) ? $new_instance['largest'] : 200;
+        $color = (!empty($new_instance['color'])) ? strip_tags($new_instance['color']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color)) {
+            $color = '';
+        }
+        $instance['color'] = $color;
         return $instance;
     }
 } // Class wpctc_widget ends here

@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.3.4';
+        const VERSION = '0.4';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 
@@ -81,6 +81,8 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
             );
 
             if (is_admin()) {
+                wp_enqueue_style('farbtastic');
+                wp_enqueue_script('farbtastic');
                 wp_enqueue_script(self::PREFIX . 'wp-category-tag-cloud-admin');
             } else {
                 wp_enqueue_style(self::PREFIX . 'wpctc');
