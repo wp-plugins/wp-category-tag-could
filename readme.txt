@@ -1,10 +1,10 @@
 === WP Category Tag Cloud ===
 Contributors: benohead, amazingweb-gmbh
 Donate link: http://benohead.com/donate/
-Tags: cat, category, cloud, configurable, tags, tag-cloud, taxonomy, widget
+Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.4
+Stable tag: 0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,12 @@ Display a configurable cloud of tags, categories or any other taxonomy filtered 
 
 WP Category Tag Cloud provides a configurable widget displaying a cloud of tags, categories or any other taxonomy.
 
-You configure:
+The cloud elements can be displayed as a standard 2D list, as a 3D sphere (using HTML5 and JavaScript) or as a list of price tags (see screenshots).
+
+Unlike other tag cloud plugins, WP Category Tag Cloud uses no Flash, but only HTML, JavaScript and CSS to display the cloud. This makes sure this plugin is compatible with any device with a modern browser.
+It also doesn't generate the HTML tags for the cloud by itself but relies on WordPress functions. This means that if you use other plugins which add filters related to tag cloud, this plugin will integrate properly with them.
+
+You can configure:
 
 * the maximum number of taxonomy terms displayed
 * whether the entries in the cloud are ordered by name or post count
@@ -22,8 +27,11 @@ You configure:
 * whether the cloud is rendered as a flat list separated by spaces, as a UL tag with the wp-tag-cloud class, price tags or as a 3D HTML5 based tag cloud.
 * the zoom factor in case of a 3D HTML5 based tag cloud
 * the size of the smallest and largest items in the cloud (in percentage)
+* the font color used
+* whether the opacity of the tags should be modified based on the usage
+* whether the widget should be cached and for how long
 
-You can also choose to only consider posts with specific categories or tags.
+You can also choose to only consider posts with specific categories (with or without children) or tags.
 
 == Installation ==
 
@@ -47,6 +55,11 @@ Send an email to henri.benoit@gmail.com
 4. Price tags
 
 == Changelog ==
+
+= 0.5 =
+
+* Support for opacity.
+* Support for widget caching.
 
 = 0.4 =
 

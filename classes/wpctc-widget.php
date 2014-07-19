@@ -56,6 +56,21 @@ class WPCTC_Widget extends WP_Widget
     {
         global $wpdb;
 
+        $md5 = md5(print_r(array_merge($args, $instance), true));
+        $cache_id = 'wp_ctc_cache_' . $args['widget_id'];
+
+        if (isset($instance['cache']) && $instance['cache'] === "1") {
+            $current_time = time();
+            $wp_ctc_cache = get_option($cache_id, array("", 0, ""));
+            if ($wp_ctc_cache[1] > $current_time && $wp_ctc_cache[2] == $md5) {
+                echo $wp_ctc_cache[0];
+                error_log("Returning cached widget: " . $cache_id."(".$md5.")");
+                return;
+            }
+        }
+
+        ob_start();
+
         $title = apply_filters('widget_title', $instance['title']);
         echo $args['before_widget'];
         if (!empty($title))
@@ -109,7 +124,8 @@ class WPCTC_Widget extends WP_Widget
         }
         ?>
     <div
-        id="tagcloud" <?php echo ($instance['format'] == 'price') ? " class='wpctc-" . $args['widget_id'] . " wpctc-tag-links' " : " class='wpctc-" . $args['widget_id'] . "' "; ?>>
+        id="tagcloud"
+        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?>'>
         <?php
         if ($instance['format'] != 'array') {
             wp_tag_cloud($cloud_args);
@@ -143,6 +159,16 @@ class WPCTC_Widget extends WP_Widget
         <?php
         }
         echo $args['after_widget'];
+
+        $output = ob_get_clean();
+
+        if (isset($instance['cache']) && $instance['cache'] === "1") {
+            $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
+            update_option($cache_id, array($output, $current_time + $timeout, $md5));
+            error_log("Caching widget for " . $timeout . " seconds: " . $cache_id."(".$md5.")");
+        }
+
+        echo $output;
     }
 
     public function form($instance)
@@ -150,6 +176,8 @@ class WPCTC_Widget extends WP_Widget
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
         $child_categories = isset($instance['child_categories']) ? $instance['child_categories'] : "0";
+        $opacity = isset($instance['opacity']) ? $instance['opacity'] : "0";
+        $cache = isset($instance['cache']) ? $instance['cache'] : "0";
         $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
@@ -157,6 +185,7 @@ class WPCTC_Widget extends WP_Widget
         $number = isset($instance['number']) && (is_int($instance['number']) || ctype_digit($instance['number'])) ? $instance['number'] : 0;
         $taxonomy = isset($instance['taxonomy']) && strlen($instance['taxonomy']) > 0 ? $instance['taxonomy'] : 'post_tag';
         $zoom = isset($instance['zoom']) && is_numeric($instance['zoom']) ? $instance['zoom'] : 1;
+        $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
         $smallest = isset($instance['smallest']) && (is_int($instance['smallest']) || ctype_digit($instance['smallest'])) ? $instance['smallest'] : 75;
         $largest = isset($instance['largest']) && (is_int($instance['largest']) || ctype_digit($instance['largest'])) ? $instance['largest'] : 200;
         $color = (!empty($instance['color'])) ? strip_tags($instance['color']) : '';
@@ -217,14 +246,14 @@ class WPCTC_Widget extends WP_Widget
             </select>
         </p>
         <p>
-            <label
-                for="<?php echo $this->get_field_id('child_categories'); ?>"><?php _e('Include children:'); ?></label>
             <input id="<?php echo $this->get_field_id('child_categories'); ?>"
                    name="<?php echo $this->get_field_name('child_categories'); ?>" type="checkbox"
                    class="widefat"
                    style="height: auto;"
                    value="1"
                 <?php echo checked($child_categories, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('child_categories'); ?>"><?php _e('Include children'); ?></label>
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('tag_id'); ?>"><?php _e('Tags:'); ?></label><br/>
@@ -316,6 +345,32 @@ class WPCTC_Widget extends WP_Widget
                    value="<?php echo esc_attr($largest); ?>"/>
         </p>
         <p>
+            <input id="<?php echo $this->get_field_id('cache'); ?>"
+                   name="<?php echo $this->get_field_name('cache'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($cache, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('cache'); ?>"><?php _e('Cache cloud'); ?></label>
+            <label
+                for="<?php echo $this->get_field_id('timeout'); ?>"><?php _e('for'); ?></label>
+            <input size="6" id="<?php echo $this->get_field_id('timeout'); ?>"
+                   name="<?php echo $this->get_field_name('timeout'); ?>" type="text"
+                   value="<?php echo esc_attr($timeout); ?>"/>
+            <?php _e('seconds'); ?>
+        </p>
+        <p>
+            <input id="<?php echo $this->get_field_id('opacity'); ?>"
+                   name="<?php echo $this->get_field_name('opacity'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($opacity, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('opacity'); ?>"><?php _e('Adapt opacity'); ?></label>
+        </p>
+        <p>
             <label for="<?php echo $this->get_field_id('color'); ?>"><?php _e('Font color:'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('color'); ?>"
                    name="<?php echo $this->get_field_name('color'); ?>" type="text"
@@ -333,6 +388,8 @@ class WPCTC_Widget extends WP_Widget
         $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
         $instance['category_id'] = $new_instance['category_id'];
         $instance['child_categories'] = $new_instance['child_categories'];
+        $instance['opacity'] = $new_instance['opacity'];
+        $instance['cache'] = $new_instance['cache'];
         $instance['tag_id'] = $new_instance['tag_id'];
         $instance['order_by'] = isset($new_instance['order_by']) && strlen($new_instance['order_by']) > 0 ? $new_instance['order_by'] : 'name';
         $instance['order'] = isset($new_instance['order']) && strlen($new_instance['order']) > 0 ? $new_instance['order'] : 'ASC';
@@ -340,6 +397,7 @@ class WPCTC_Widget extends WP_Widget
         $instance['number'] = isset($new_instance['number']) && (is_int($new_instance['number']) || ctype_digit($new_instance['number'])) ? $new_instance['number'] : 0;
         $instance['taxonomy'] = isset($new_instance['taxonomy']) && strlen($new_instance['taxonomy']) > 0 ? $new_instance['taxonomy'] : 'post_tag';
         $instance['zoom'] = isset($new_instance['zoom']) && is_numeric($new_instance['zoom']) ? $new_instance['zoom'] : 1;
+        $instance['timeout'] = isset($new_instance['timeout']) && is_numeric($new_instance['timeout']) ? $new_instance['timeout'] : 60;
         $instance['smallest'] = isset($new_instance['smallest']) && (is_int($new_instance['smallest']) || ctype_digit($new_instance['smallest'])) ? $new_instance['smallest'] : 75;
         $instance['largest'] = isset($new_instance['largest']) && (is_int($new_instance['largest']) || ctype_digit($new_instance['largest'])) ? $new_instance['largest'] : 200;
         $color = (!empty($new_instance['color'])) ? strip_tags($new_instance['color']) : '';
