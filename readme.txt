@@ -4,11 +4,11 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.5
+Stable tag: 0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display a configurable cloud of tags, categories or any other taxonomy filtered by tags or categories.
+Display a configurable 2D or 3D cloud of tags, categories or any other taxonomy filtered by tags or categories.
 
 == Description ==
 
@@ -54,7 +54,13 @@ Send an email to henri.benoit@gmail.com
 
 4. Price tags
 
+5. Horizontal bars
+
 == Changelog ==
+
+= 0.6 =
+
+* Terms can be displayed as horizontal bars.
 
 = 0.5 =
 

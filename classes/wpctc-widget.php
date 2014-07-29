@@ -64,7 +64,7 @@ class WPCTC_Widget extends WP_Widget
             $wp_ctc_cache = get_option($cache_id, array("", 0, ""));
             if ($wp_ctc_cache[1] > $current_time && $wp_ctc_cache[2] == $md5) {
                 echo $wp_ctc_cache[0];
-                error_log("Returning cached widget: " . $cache_id."(".$md5.")");
+                error_log("Returning cached widget: " . $cache_id . "(" . $md5 . ")");
                 return;
             }
         }
@@ -110,7 +110,7 @@ class WPCTC_Widget extends WP_Widget
             'largest' => $instance['format'] == 'price' ? '100' : $instance['largest'],
             'unit' => '%',
             'number' => $instance['number'],
-            'format' => $instance['format'] == 'price' ? 'flat' : $instance['format'],
+            'format' => $instance['format'] == 'price' ? 'flat' : $instance['format'] == 'bars' ? 'list' : $instance['format'],
             'orderby' => $instance['order_by'],
             'order' => $instance['order'],
             'include' => null,
@@ -125,11 +125,9 @@ class WPCTC_Widget extends WP_Widget
         ?>
     <div
         id="tagcloud"
-        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?>'>
+        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?>'>
         <?php
-        if ($instance['format'] != 'array') {
-            wp_tag_cloud($cloud_args);
-        } else {
+        if ($instance['format'] == 'array') {
             $tags = wp_tag_cloud($cloud_args);
             ?>
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
@@ -144,7 +142,43 @@ class WPCTC_Widget extends WP_Widget
                 <?php } ?>
             </ul>
         <?php
+        } elseif ($instance['format'] == 'bars') {
+            ?>
+            <ul class='wp-tag-cloud'>
+                <?php
+                $terms = get_terms($instance['taxonomy'], $cloud_args);
+                $max = 1;
+                foreach ($terms as $value) {
+                    $term = (array)$value;
+                    if ($max < $term['count']) {
+                        $max = $term['count'];
+                    }
+                }
+                foreach ($terms as $value) {
+                    $term = (array)$value;
+                    $width = 100 / $max * $term['count'];
+                    $this_term = get_term_by('slug', $term['slug'], $instance['taxonomy']);
+                    $style = 'width:' . $width . '%;';
+                    if (isset($instance['background']) && !empty($instance['background'])) {
+                        $style .= 'background-color: ' . $instance['background'] . ';';
+                    }
+                    if (isset($instance['border']) && !empty($instance['border'])) {
+                        $style .= 'border-color: ' . $instance['border'] . ';';
+                    }
+                    ?>
+                    <li style="<?= $style; ?>">
+                        <a href="<?= print_r(get_term_link(intval($this_term->term_id), $this_term->taxonomy), true); ?>"><?= $term['name']; ?>
+                            (<?= $term['count']; ?>)</a>
+                    </li>
+                <?php
+                }
+                ?>
+            </ul>
+        <?php
+        } else {
+            wp_tag_cloud($cloud_args);
         }
+
         ?>
         </div>
         <?php
@@ -165,13 +199,14 @@ class WPCTC_Widget extends WP_Widget
         if (isset($instance['cache']) && $instance['cache'] === "1") {
             $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
             update_option($cache_id, array($output, $current_time + $timeout, $md5));
-            error_log("Caching widget for " . $timeout . " seconds: " . $cache_id."(".$md5.")");
+            error_log("Caching widget for " . $timeout . " seconds: " . $cache_id . "(" . $md5 . ")");
         }
 
         echo $output;
     }
 
-    public function form($instance)
+    public
+    function form($instance)
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
@@ -191,6 +226,14 @@ class WPCTC_Widget extends WP_Widget
         $color = (!empty($instance['color'])) ? strip_tags($instance['color']) : '';
         if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $color)) {
             $color = '';
+        }
+        $background = (!empty($instance['background'])) ? strip_tags($instance['background']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $background)) {
+            $background = '';
+        }
+        $border = (!empty($instance['border'])) ? strip_tags($instance['border']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $border)) {
+            $border = '';
         }
         ?>
         <p>
@@ -258,7 +301,8 @@ class WPCTC_Widget extends WP_Widget
         <p>
             <label for="<?php echo $this->get_field_id('tag_id'); ?>"><?php _e('Tags:'); ?></label><br/>
             <select id="<?php echo $this->get_field_id('tag_id'); ?>"
-                    name="<?php echo $this->get_field_name('tag_id'); ?>[]" size=3 multiple="multiple" class="widefat"
+                    name="<?php echo $this->get_field_name('tag_id'); ?>[]" size=3 multiple="multiple"
+                    class="widefat"
                     style="height: auto;">
                 <?php
                 $tags = get_tags(array('hide_empty' => 0));
@@ -313,7 +357,11 @@ class WPCTC_Widget extends WP_Widget
             <select id="<?php echo $this->get_field_id('format'); ?>"
                     name="<?php echo $this->get_field_name('format'); ?>" class="widefat cloud-type-selector">
                 <?php
-                $taxonomies = array('flat' => __('Separated by whitespace'), 'price' => __('Price tags'), 'list' => __('UL with a class of wp-tag-cloud'), 'array' => __('3D HTML5 Cloud'));
+                $taxonomies = array('flat' => __('Separated by whitespace'),
+                    'price' => __('Price tags'),
+                    'bars' => __('Bars'),
+                    'list' => __('UL with a class of wp-tag-cloud'),
+                    'array' => __('3D HTML5 Cloud'));
                 foreach ($taxonomies as $field_id => $field_name) {
                     ?>
                     <option
@@ -378,10 +426,26 @@ class WPCTC_Widget extends WP_Widget
             <small><em><?php _e('Leave empty to use the default theme color.'); ?></em></small>
         <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('color'); ?>"></div>
         </p>
+        <p class="bars-config">
+            <label for="<?php echo $this->get_field_id('background'); ?>"><?php _e('Background color:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('background'); ?>"
+                   name="<?php echo $this->get_field_name('background'); ?>" type="text"
+                   value="<?php echo esc_attr($background); ?>"/>
+            <small><em><?php _e('Leave empty to use the default theme background color.'); ?></em></small>
+        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('background'); ?>"></div>
+        </p>
+        <p class="bars-config">
+            <label for="<?php echo $this->get_field_id('border'); ?>"><?php _e('Border color:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('border'); ?>"
+                   name="<?php echo $this->get_field_name('border'); ?>" type="text"
+                   value="<?php echo esc_attr($border); ?>"/>
+            <small><em><?php _e('Leave empty to use the default theme border color.'); ?></em></small>
+        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('border'); ?>"></div>
+        </p>
     <?php
     }
 
-    // Updating widget replacing old instances with new
+// Updating widget replacing old instances with new
     function update($new_instance, $old_instance)
     {
         $instance = array();
@@ -405,6 +469,16 @@ class WPCTC_Widget extends WP_Widget
             $color = '';
         }
         $instance['color'] = $color;
+        $background = (!empty($new_instance['background'])) ? strip_tags($new_instance['background']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $background)) {
+            $background = '';
+        }
+        $instance['background'] = $background;
+        $border = (!empty($new_instance['border'])) ? strip_tags($new_instance['border']) : '';
+        if (!preg_match('/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/', $border)) {
+            $border = '';
+        }
+        $instance['border'] = $border;
         return $instance;
     }
 } // Class wpctc_widget ends here

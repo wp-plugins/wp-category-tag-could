@@ -20,14 +20,22 @@ function wpctcAdminWrapper($) {
             if ($(this).val() == 'array') {
                 $(this).parent().parent().find('.cloud-non-price').show();
                 $(this).parent().parent().find('.canvas-config').show();
+                $(this).parent().parent().find('.bars-config').hide();
             }
             else if ($(this).val() == 'price') {
                 $(this).parent().parent().find('.canvas-config').hide();
                 $(this).parent().parent().find('.cloud-non-price').hide();
+                $(this).parent().parent().find('.bars-config').hide();
+            }
+            else if ($(this).val() == 'bars') {
+                $(this).parent().parent().find('.canvas-config').hide();
+                $(this).parent().parent().find('.cloud-non-price').hide();
+                $(this).parent().parent().find('.bars-config').show();
             }
             else {
                 $(this).parent().parent().find('.cloud-non-price').show();
                 $(this).parent().parent().find('.canvas-config').hide();
+                $(this).parent().parent().find('.bars-config').hide();
             }
         },
         farbalize: function (widget_el) {

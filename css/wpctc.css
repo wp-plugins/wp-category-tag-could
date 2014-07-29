@@ -50,3 +50,19 @@
 canvas.tagcloud-canvas {
     width: 100%;
 }
+
+.wpctc-bars li{
+    background:#eee;
+    line-height:24px !important;
+    height:24px !important;
+    border-radius:12px;
+    border:1px solid #ccc;
+    margin:10px 0;
+    overflow:hidden;
+}
+
+.wpctc-bars a{
+    padding:0 10px;
+    position:absolute;
+    display:block;
+}
