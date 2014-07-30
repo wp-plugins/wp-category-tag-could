@@ -424,7 +424,7 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('color'); ?>" type="text"
                    value="<?php echo esc_attr($color); ?>"/>
             <small><em><?php _e('Leave empty to use the default theme color.'); ?></em></small>
-        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('color'); ?>"></div>
+        <span class="wpctc-color-picker" rel="<?php echo $this->get_field_id('color'); ?>"></span>
         </p>
         <p class="bars-config">
             <label for="<?php echo $this->get_field_id('background'); ?>"><?php _e('Background color:'); ?></label>
@@ -432,7 +432,7 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('background'); ?>" type="text"
                    value="<?php echo esc_attr($background); ?>"/>
             <small><em><?php _e('Leave empty to use the default theme background color.'); ?></em></small>
-        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('background'); ?>"></div>
+        <span class="wpctc-color-picker" rel="<?php echo $this->get_field_id('background'); ?>"></span>
         </p>
         <p class="bars-config">
             <label for="<?php echo $this->get_field_id('border'); ?>"><?php _e('Border color:'); ?></label>
@@ -440,7 +440,7 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('border'); ?>" type="text"
                    value="<?php echo esc_attr($border); ?>"/>
             <small><em><?php _e('Leave empty to use the default theme border color.'); ?></em></small>
-        <div class="wpctc-color-picker" rel="<?php echo $this->get_field_id('border'); ?>"></div>
+        <span class="wpctc-color-picker" rel="<?php echo $this->get_field_id('border'); ?>"></span>
         </p>
     <?php
     }
