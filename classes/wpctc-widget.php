@@ -125,7 +125,7 @@ class WPCTC_Widget extends WP_Widget
         ?>
     <div
         id="tagcloud"
-        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?>'>
+        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?> <?php echo (isset($instance['tilt']) && $instance['tilt'] === "1") ? "wpctc-tilt" : ""; ?> <?php echo (isset($instance['colorize']) && $instance['colorize'] === "1") ? "wpctc-colorize" : ""; ?>'>
         <?php
         if ($instance['format'] == 'array') {
             $tags = wp_tag_cloud($cloud_args);
@@ -196,6 +196,10 @@ class WPCTC_Widget extends WP_Widget
 
         $output = ob_get_clean();
 
+        if (isset($instance['nofollow']) && $instance['nofollow'] === "1") {
+            $output = str_replace('<a href=', '<a rel="nofollow" href=',  $output);
+        }
+        
         if (isset($instance['cache']) && $instance['cache'] === "1") {
             $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
             update_option($cache_id, array($output, $current_time + $timeout, $md5));
@@ -212,7 +216,10 @@ class WPCTC_Widget extends WP_Widget
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
         $child_categories = isset($instance['child_categories']) ? $instance['child_categories'] : "0";
         $opacity = isset($instance['opacity']) ? $instance['opacity'] : "0";
+        $tilt = isset($instance['tilt']) ? $instance['tilt'] : "0";
+        $colorize = isset($instance['colorize']) ? $instance['colorize'] : "0";
         $cache = isset($instance['cache']) ? $instance['cache'] : "0";
+        $nofollow = isset($instance['nofollow']) ? $instance['nofollow'] : "0";
         $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
@@ -419,6 +426,36 @@ class WPCTC_Widget extends WP_Widget
                 for="<?php echo $this->get_field_id('opacity'); ?>"><?php _e('Adapt opacity'); ?></label>
         </p>
         <p>
+            <input id="<?php echo $this->get_field_id('tilt'); ?>"
+                   name="<?php echo $this->get_field_name('tilt'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($tilt, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('tilt'); ?>"><?php _e('Tilt terms'); ?></label>
+        </p>
+        <p>
+            <input id="<?php echo $this->get_field_id('nofollow'); ?>"
+                   name="<?php echo $this->get_field_name('nofollow'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($nofollow, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('nofollow'); ?>"><?php _e('No-follow links'); ?></label>
+        </p>
+        <p>
+            <input id="<?php echo $this->get_field_id('colorize'); ?>"
+                   name="<?php echo $this->get_field_name('colorize'); ?>" type="checkbox"
+                   class="widefat"
+                   style="height: auto;"
+                   value="1"
+                <?php echo checked($colorize, "1"); ?>>
+            <label
+                for="<?php echo $this->get_field_id('colorize'); ?>"><?php _e('Random color'); ?></label>
+        </p>
+        <p>
             <label for="<?php echo $this->get_field_id('color'); ?>"><?php _e('Font color:'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('color'); ?>"
                    name="<?php echo $this->get_field_name('color'); ?>" type="text"
@@ -453,6 +490,9 @@ class WPCTC_Widget extends WP_Widget
         $instance['category_id'] = $new_instance['category_id'];
         $instance['child_categories'] = $new_instance['child_categories'];
         $instance['opacity'] = $new_instance['opacity'];
+        $instance['tilt'] = $new_instance['tilt'];
+        $instance['colorize'] = $new_instance['colorize'];
+        $instance['nofollow'] = $new_instance['nofollow'];
         $instance['cache'] = $new_instance['cache'];
         $instance['tag_id'] = $new_instance['tag_id'];
         $instance['order_by'] = isset($new_instance['order_by']) && strlen($new_instance['order_by']) > 0 ? $new_instance['order_by'] : 'name';

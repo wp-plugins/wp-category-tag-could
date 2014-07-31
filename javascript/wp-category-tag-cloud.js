@@ -14,6 +14,19 @@ function wpctcWrapper($) {
                     $(this).css({ opacity: (i + 1) * 2 / 3 / opaque_a.length + 1 / 3 });
                 });
             });
+
+            $('.wpctc-tilt a').each(function () {
+                var $deg = Math.floor((Math.random() * 90) - 45);
+                $(this).css({transform: 'rotate(' + $deg + 'deg)'});
+            });
+            $('.wpctc-colorize a').each(function () {
+                var $letters = '0123456789ABCDEF'.split('');
+                var $color = '#';
+                for (var i = 0; i < 6; i++) {
+                    $color += $letters[Math.floor(Math.random() * 16)];
+                }
+                $(this).style('color', $color, 'important');
+            });
         }
     }; // end wpctc
 

@@ -6,6 +6,7 @@
     line-height: 1.33333;
     text-transform: uppercase;
 }
+
 .widget .wpctc-tag-links a {
     background-color: #767676;
     border-radius: 0 2px 2px 0;
@@ -19,10 +20,12 @@
     position: relative;
     text-transform: uppercase;
 }
+
 .widget .wpctc-tag-links a:hover {
     background-color: #41A62A;
     color: #FFFFFF;
 }
+
 .widget .wpctc-tag-links a:before {
     border-bottom: 10px solid rgba(0, 0, 0, 0);
     border-right: 8px solid #767676;
@@ -34,9 +37,11 @@
     top: 0;
     width: 0;
 }
+
 .widget .wpctc-tag-links a:hover:before {
     border-right-color: #41A62A;
 }
+
 .widget .wpctc-tag-links a:after {
     background-color: #FFFFFF;
     border-radius: 50%;
@@ -47,22 +52,27 @@
     top: 8px;
     width: 4px;
 }
+
 canvas.tagcloud-canvas {
     width: 100%;
 }
 
-.wpctc-bars li{
-    background:#eee;
-    line-height:24px !important;
-    height:24px !important;
-    border-radius:12px;
-    border:1px solid #ccc;
-    margin:10px 0;
-    overflow:hidden;
+.wpctc-bars li {
+    background: #eee;
+    line-height: 24px !important;
+    height: 24px !important;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    overflow: hidden;
 }
 
-.wpctc-bars a{
-    padding:0 10px;
-    position:absolute;
-    display:block;
+.wpctc-bars a {
+    padding: 0 10px;
+    position: absolute;
+    display: block;
+}
+
+.wpctc-tilt a {
+    display: inline-block;
 }

@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.6.1';
+        const VERSION = '0.7';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 
@@ -79,6 +79,14 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
                 true
             );
 
+            wp_register_script(
+                self::PREFIX . 'jquery-style',
+                plugins_url('javascript/jquery.style.js', dirname(__FILE__)),
+                array('jquery'),
+                self::VERSION,
+                true
+            );
+
             wp_register_style(
                 self::PREFIX . 'wpctc',
                 plugins_url('css/wpctc.css', dirname(__FILE__)),
@@ -95,6 +103,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
                 wp_enqueue_style(self::PREFIX . 'wpctc');
                 wp_enqueue_script(self::PREFIX . 'jquery-tagcanvas');
                 wp_enqueue_script(self::PREFIX . 'wpctc-tagcanvas');
+                wp_enqueue_script(self::PREFIX . 'jquery-style');
                 wp_enqueue_script(self::PREFIX . 'wp-category-tag-cloud');
             }
         }
