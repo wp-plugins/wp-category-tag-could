@@ -12,10 +12,9 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.7';
+        const VERSION = '0.8';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
-
 
         /*
          * Magic methods
@@ -57,7 +56,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             wp_register_script(
                 self::PREFIX . 'wpctc-tagcanvas',
-                plugins_url('javascript/wpctc.tagcanvas.js', dirname(__FILE__)),
+                plugins_url('javascript/wpctc.tagcanvas.min.js', dirname(__FILE__)),
                 array('jquery', self::PREFIX . 'jquery-tagcanvas'),
                 self::VERSION,
                 true
@@ -65,7 +64,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             wp_register_script(
                 self::PREFIX . 'wp-category-tag-cloud-admin',
-                plugins_url('javascript/wp-category-tag-cloud-admin.js', dirname(__FILE__)),
+                plugins_url('javascript/wp-category-tag-cloud-admin.min.js', dirname(__FILE__)),
                 array('jquery'),
                 self::VERSION,
                 true
@@ -73,7 +72,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             wp_register_script(
                 self::PREFIX . 'wp-category-tag-cloud',
-                plugins_url('javascript/wp-category-tag-cloud.js', dirname(__FILE__)),
+                plugins_url('javascript/wp-category-tag-cloud.min.js', dirname(__FILE__)),
                 array('jquery'),
                 self::VERSION,
                 true
@@ -81,7 +80,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             wp_register_script(
                 self::PREFIX . 'jquery-style',
-                plugins_url('javascript/jquery.style.js', dirname(__FILE__)),
+                plugins_url('javascript/jquery.style.min.js', dirname(__FILE__)),
                 array('jquery'),
                 self::VERSION,
                 true
@@ -89,7 +88,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             wp_register_style(
                 self::PREFIX . 'wpctc',
-                plugins_url('css/wpctc.css', dirname(__FILE__)),
+                plugins_url('css/wpctc.min.css', dirname(__FILE__)),
                 array(),
                 self::VERSION,
                 'all'
@@ -217,6 +216,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             add_action('init', array($this, 'init'));
             add_action('init', array($this, 'upgrade'), 11);
+            add_shortcode('showtagcloud', array($this, 'show_tag_cloud'));
         }
 
         /**
@@ -264,6 +264,23 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected function is_valid($property = 'all')
         {
             return true;
+        }
+
+        public function show_tag_cloud($options)
+        {
+            $widget = new WPCTC_Widget;
+            $args = [
+                'before_widget' => '',
+                'before_title' => '',
+                'after_title' => '',
+                'widget_id' => 'wpctc_post_'.get_the_ID(),
+                'after_widget' => '',
+            ];
+            $options['category_id'] = isset($options['category_id']) ? explode(',', $options['category_id']) : array();
+            $options['tag_id'] = isset($options['tag_id']) ? explode(',', $options['tag_id']) : array();
+            $instance = $widget->update($options, null);
+            $instance['title'] = '';
+            $widget->widget($args, $instance);
         }
     }
 

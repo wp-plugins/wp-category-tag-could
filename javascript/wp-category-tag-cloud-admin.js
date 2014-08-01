@@ -8,13 +8,13 @@ function wpctcAdminWrapper($) {
          * Main entry point
          */
         init: function () {
-            $('.cloud-type-selector').change(wpctcAdmin.hideshow);
-            $('.cloud-type-selector').each(wpctcAdmin.hideshow);
             $('.wpctc-color-picker').each(function () {
                 wpctcAdmin.farbalize($(this));
             });
             $(document).on('widget-updated', wpctcAdmin.on_form_update);
             $(document).on('widget-added', wpctcAdmin.on_form_update);
+            $('.cloud-type-selector').change(wpctcAdmin.hideshow);
+            $('.cloud-type-selector').each(wpctcAdmin.hideshow);
         },
         hideshow: function () {
             if ($(this).val() == 'array') {
@@ -30,6 +30,11 @@ function wpctcAdminWrapper($) {
             else if ($(this).val() == 'bars') {
                 $(this).parent().parent().find('.canvas-config').hide();
                 $(this).parent().parent().find('.cloud-non-price').hide();
+                $(this).parent().parent().find('.bars-config').show();
+            }
+            else if ($(this).val() == 'rounded') {
+                $(this).parent().parent().find('.canvas-config').hide();
+                $(this).parent().parent().find('.cloud-non-price').show();
                 $(this).parent().parent().find('.bars-config').show();
             }
             else {
@@ -66,11 +71,12 @@ function wpctcAdminWrapper($) {
             }
         },
         on_form_update: function (e, widget_el) {
-            widget_el.find('.cloud-type-selector').change(wpctcAdmin.hideshow);
-            widget_el.find('.cloud-type-selector').each(wpctcAdmin.hideshow);
+            widget_el.find('.farbtastic').remove();
             widget_el.find('.wpctc-color-picker').each(function () {
                 wpctcAdmin.farbalize($(this));
             });
+            widget_el.find('.cloud-type-selector').change(wpctcAdmin.hideshow);
+            widget_el.find('.cloud-type-selector').each(wpctcAdmin.hideshow);
         }
     }; // end wpctcAdmin
 

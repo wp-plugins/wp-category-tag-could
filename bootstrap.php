@@ -3,7 +3,7 @@
 Plugin Name: WP Category Tag Cloud
 Plugin URI:  https://wordpress.org/plugins/wp-category-tag-could/
 Description: Display a configurable cloud of tags, categories or any other taxonomy filtered by tags or categories.
-Version:     0.7
+Version:     0.8
 Author:      Henri Benoit
 Author URI:  http://benohead.com
 */
@@ -68,4 +68,11 @@ if (wpctc_requirements_met()) {
     }
 } else {
     add_action('admin_notices', 'wpctc_requirements_error');
+}
+
+if (class_exists('WordPress_Category_Tag_Cloud')) {
+    function show_tag_cloud($options)
+    {
+        $GLOBALS['wpctc']->show_tag_cloud($options);
+    }
 }

@@ -110,7 +110,7 @@ class WPCTC_Widget extends WP_Widget
             'largest' => $instance['format'] == 'price' ? '100' : $instance['largest'],
             'unit' => '%',
             'number' => $instance['number'],
-            'format' => $instance['format'] == 'price' ? 'flat' : $instance['format'] == 'bars' ? 'list' : $instance['format'],
+            'format' => $instance['format'] == 'price' ? 'flat' : $instance['format'] == 'bars' ? 'list' : $instance['format'] == 'rounded' ? 'list' : $instance['format'],
             'orderby' => $instance['order_by'],
             'order' => $instance['order'],
             'include' => null,
@@ -124,8 +124,8 @@ class WPCTC_Widget extends WP_Widget
         }
         ?>
     <div
-        id="tagcloud"
-        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?> <?php echo (isset($instance['tilt']) && $instance['tilt'] === "1") ? "wpctc-tilt" : ""; ?> <?php echo (isset($instance['colorize']) && $instance['colorize'] === "1") ? "wpctc-colorize" : ""; ?>'>
+        id="<?php echo $args['widget_id']; ?>-tagcloud"
+        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo ($instance['format'] == 'rounded') ? "wpctc-rounded" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?> <?php echo (isset($instance['tilt']) && $instance['tilt'] === "1") ? "wpctc-tilt" : ""; ?> <?php echo (isset($instance['colorize']) && $instance['colorize'] === "1") ? "wpctc-colorize" : ""; ?>'>
         <?php
         if ($instance['format'] == 'array') {
             $tags = wp_tag_cloud($cloud_args);
@@ -188,6 +188,26 @@ class WPCTC_Widget extends WP_Widget
                 <?php echo ".wpctc-".$args['widget_id']; ?>
                 a {
                     color: <?php echo $instance['color']; ?> !important;
+                }
+            </style>
+        <?php
+        }
+        if ($instance['format'] == 'rounded' && isset($instance['background']) && !empty($instance['background'])) {
+            ?>
+            <style type="text/css">
+                <?php echo ".wpctc-".$args['widget_id']; ?>
+                a {
+                    background-color: <?php echo $instance['background']; ?> !important;
+                }
+            </style>
+        <?php
+        }
+        if ($instance['format'] == 'rounded' && isset($instance['border']) && !empty($instance['border'])) {
+            ?>
+            <style type="text/css">
+                <?php echo ".wpctc-".$args['widget_id']; ?>
+                a {
+                    border-color: <?php echo $instance['border']; ?> !important;
                 }
             </style>
         <?php
@@ -367,6 +387,7 @@ class WPCTC_Widget extends WP_Widget
                 $taxonomies = array('flat' => __('Separated by whitespace'),
                     'price' => __('Price tags'),
                     'bars' => __('Bars'),
+                    'rounded' => __('Rounded corners'),
                     'list' => __('UL with a class of wp-tag-cloud'),
                     'array' => __('3D HTML5 Cloud'));
                 foreach ($taxonomies as $field_id => $field_name) {
@@ -487,14 +508,14 @@ class WPCTC_Widget extends WP_Widget
     {
         $instance = array();
         $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
-        $instance['category_id'] = $new_instance['category_id'];
-        $instance['child_categories'] = $new_instance['child_categories'];
-        $instance['opacity'] = $new_instance['opacity'];
-        $instance['tilt'] = $new_instance['tilt'];
-        $instance['colorize'] = $new_instance['colorize'];
-        $instance['nofollow'] = $new_instance['nofollow'];
-        $instance['cache'] = $new_instance['cache'];
-        $instance['tag_id'] = $new_instance['tag_id'];
+        $instance['category_id'] = isset($new_instance['category_id']) ? $new_instance['category_id'] : array();
+        $instance['child_categories'] = isset($new_instance['child_categories']) ? $new_instance['child_categories'] : "0";
+        $instance['opacity'] = isset($new_instance['opacity']) ? $new_instance['opacity'] : "0";
+        $instance['tilt'] = isset($new_instance['tilt']) ? $new_instance['tilt'] : "0";
+        $instance['colorize'] = isset($new_instance['colorize']) ? $new_instance['colorize'] : "0";
+        $instance['nofollow'] = isset($new_instance['nofollow']) ? $new_instance['nofollow'] : "0";
+        $instance['cache'] = isset($new_instance['cache']) ? $new_instance['cache'] : "0";
+        $instance['tag_id'] = isset($new_instance['tag_id']) ? $new_instance['tag_id'] : array();
         $instance['order_by'] = isset($new_instance['order_by']) && strlen($new_instance['order_by']) > 0 ? $new_instance['order_by'] : 'name';
         $instance['order'] = isset($new_instance['order']) && strlen($new_instance['order']) > 0 ? $new_instance['order'] : 'ASC';
         $instance['format'] = isset($new_instance['format']) && strlen($new_instance['format']) > 0 ? $new_instance['format'] : 'flat';

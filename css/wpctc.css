@@ -1,4 +1,4 @@
-.widget .wpctc-tag-links {
+ .wpctc-tag-links {
     clear: both;
     color: #767676;
     font-size: 12px;
@@ -7,7 +7,11 @@
     text-transform: uppercase;
 }
 
-.widget .wpctc-tag-links a {
+ .wpctc-tag-links li {
+    display: inline-block;
+}
+
+ .wpctc-tag-links a {
     background-color: #767676;
     border-radius: 0 2px 2px 0;
     color: #FFFFFF;
@@ -21,12 +25,12 @@
     text-transform: uppercase;
 }
 
-.widget .wpctc-tag-links a:hover {
+ .wpctc-tag-links a:hover {
     background-color: #41A62A;
     color: #FFFFFF;
 }
 
-.widget .wpctc-tag-links a:before {
+ .wpctc-tag-links a:before {
     border-bottom: 10px solid rgba(0, 0, 0, 0);
     border-right: 8px solid #767676;
     border-top: 10px solid rgba(0, 0, 0, 0);
@@ -38,11 +42,11 @@
     width: 0;
 }
 
-.widget .wpctc-tag-links a:hover:before {
+ .wpctc-tag-links a:hover:before {
     border-right-color: #41A62A;
 }
 
-.widget .wpctc-tag-links a:after {
+ .wpctc-tag-links a:after {
     background-color: #FFFFFF;
     border-radius: 50%;
     content: "";
@@ -68,11 +72,33 @@ canvas.tagcloud-canvas {
 }
 
 .wpctc-bars a {
+    display: inline-block;
     padding: 0 10px;
-    position: absolute;
-    display: block;
 }
 
 .wpctc-tilt a {
     display: inline-block;
 }
+
+.wpctc-rounded {
+    padding: 10px;
+    overflow: hidden;
+    clear: both;
+}
+
+.wpctc-rounded a {
+    border: 1px solid;
+    border-radius: 8px 8px 8px 8px;
+    -moz-border-radius: 8px 8px 8px 8px;
+    -webkit-border-radius: 8px 8px 8px 8px;
+    display: block;
+    margin: 3px;
+    padding: 3px 5px 3px 5px;
+    text-decoration: none;
+    float: left;
+}
+
+ .wpctc-rounded ul {
+     list-style: none outside none;
+     margin: 0;
+ }
