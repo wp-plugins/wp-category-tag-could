@@ -86,6 +86,7 @@ Options:
 * background: background color e.g. #333333
 * border: border color e.g. #AAAAAA
 
+
 = How can I programmatically insert a term cloud ? =
 Use the show_tag_cloud() function. It takes an associative array as parameter. The parameters are the same as for the short code above.
 
