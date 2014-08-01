@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.8';
+        const VERSION = '0.8.1';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 
@@ -269,13 +269,13 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         public function show_tag_cloud($options)
         {
             $widget = new WPCTC_Widget;
-            $args = [
+            $args = array(
                 'before_widget' => '',
                 'before_title' => '',
                 'after_title' => '',
-                'widget_id' => 'wpctc_post_'.get_the_ID(),
+                'widget_id' => 'wpctc_post_' . get_the_ID(),
                 'after_widget' => '',
-            ];
+            );
             $options['category_id'] = isset($options['category_id']) ? explode(',', $options['category_id']) : array();
             $options['tag_id'] = isset($options['tag_id']) ? explode(',', $options['tag_id']) : array();
             $instance = $widget->update($options, null);
