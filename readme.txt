@@ -61,7 +61,7 @@ Send an email to henri.benoit@gmail.com
 = How can I display a term cloud in a page or a post? =
 You can use the showtagcloud short code.
 
-Syntax: [showtagcloud <options>]
+Syntax: [showtagcloud options...]
 
 Options:
 
