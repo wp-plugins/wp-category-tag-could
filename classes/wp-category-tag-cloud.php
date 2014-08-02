@@ -12,7 +12,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
         protected $modules;
         protected $modified_types = array();
 
-        const VERSION = '0.8.1';
+        const VERSION = '0.8.2';
         const PREFIX = 'wpctc_';
         const DEBUG_MODE = false;
 
@@ -216,7 +216,7 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
 
             add_action('init', array($this, 'init'));
             add_action('init', array($this, 'upgrade'), 11);
-            add_shortcode('showtagcloud', array($this, 'show_tag_cloud'));
+            add_shortcode('showtagcloud', array($this, 'get_tag_cloud'));
         }
 
         /**
@@ -266,8 +266,10 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
             return true;
         }
 
-        public function show_tag_cloud($options)
+        public function get_tag_cloud($options)
         {
+            ob_start();
+
             $widget = new WPCTC_Widget;
             $args = array(
                 'before_widget' => '',
@@ -281,6 +283,10 @@ if (!class_exists('WordPress_Category_Tag_Cloud')) {
             $instance = $widget->update($options, null);
             $instance['title'] = '';
             $widget->widget($args, $instance);
+
+            $output = ob_get_clean();
+
+            return $output;
         }
     }
 
