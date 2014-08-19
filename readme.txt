@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.8.2
+Stable tag: 0.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,10 @@ Use the show_tag_cloud() function. It takes an associative array as parameter. T
 5. Horizontal bars
 
 == Changelog ==
+
+= 0.8.3 =
+
+* Background color can now be set for price tags
 
 = 0.8.2 =
 

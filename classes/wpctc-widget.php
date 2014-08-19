@@ -189,15 +189,22 @@ class WPCTC_Widget extends WP_Widget
                 a {
                     color: <?php echo $instance['color']; ?> !important;
                 }
+                <?php echo ".wpctc-tag-links.wpctc-".$args['widget_id']; ?>
+                a:after {
+                    background-color: <?php echo $instance['color']; ?> !important;
+                }
             </style>
         <?php
         }
-        if ($instance['format'] == 'rounded' && isset($instance['background']) && !empty($instance['background'])) {
+        if (($instance['format'] == 'rounded' || $instance['format'] == 'price') && isset($instance['background']) && !empty($instance['background'])) {
             ?>
             <style type="text/css">
                 <?php echo ".wpctc-".$args['widget_id']; ?>
                 a {
                     background-color: <?php echo $instance['background']; ?> !important;
+                }
+                <?php echo ".wpctc-tag-links.wpctc-".$args['widget_id']; ?> a:before {
+                    border-right-color: <?php echo $instance['background']; ?> !important;
                 }
             </style>
         <?php
@@ -492,7 +499,7 @@ class WPCTC_Widget extends WP_Widget
             <small><em><?php _e('Leave empty to use the default theme background color.'); ?></em></small>
             <span class="wpctc-color-picker" rel="<?php echo $this->get_field_id('background'); ?>"></span>
         </p>
-        <p class="bars-config">
+        <p class="bars-config border-color">
             <label for="<?php echo $this->get_field_id('border'); ?>"><?php _e('Border color:'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('border'); ?>"
                    name="<?php echo $this->get_field_name('border'); ?>" type="text"

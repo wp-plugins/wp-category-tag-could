@@ -25,7 +25,8 @@ function wpctcAdminWrapper($) {
             else if ($(this).val() == 'price') {
                 $(this).parent().parent().find('.canvas-config').hide();
                 $(this).parent().parent().find('.cloud-non-price').hide();
-                $(this).parent().parent().find('.bars-config').hide();
+                $(this).parent().parent().find('.bars-config').show();
+                $(this).parent().parent().find('.bars-config.border-color').hide();
             }
             else if ($(this).val() == 'bars') {
                 $(this).parent().parent().find('.canvas-config').hide();
