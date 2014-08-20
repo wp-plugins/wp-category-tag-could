@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 0.8.3
+Stable tag: 0.8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -56,9 +56,11 @@ If you do not want to display the cloud as a side bar widget but in the content 
 == Frequently Asked Questions ==
 
 = How can I contact you with a complaint, a question or a suggestion? =
-Send an email to henri.benoit@gmail.com
+
+Please use the support forum on wordpress.org or send an email to henri.benoit@gmail.com
 
 = How can I display a term cloud in a page or a post? =
+
 You can use the showtagcloud short code.
 
 Syntax: [showtagcloud options...]
@@ -82,13 +84,59 @@ Options:
 * zoom: initial zoom factor e.g. 1
 * smallest: smallest font size in percent of the default font size e.g. 75
 * largest: largest font size in percent of the default font size e.g. 200
-* color: font color e.g #ffffff
-* background: background color e.g. #333333
-* border: border color e.g. #AAAAAA
-
+* color: font color e.g \#ffffff
+* background: background color e.g. \#333333
+* border: border color e.g. \#AAAAAA
 
 = How can I programmatically insert a term cloud ? =
+
 Use the show_tag_cloud() function. It takes an associative array as parameter. The parameters are the same as for the short code above.
+
+The easiest way to get to the code you need to write is to first create a new post or page (you won't need to publish it) and add a shortcode using the additional button provided in the visual editor. Select all the settings you want to have an insert the shortcode to the post/page. You can also use the preview button to see how the cloud would look like.
+
+Let's assume this is the shortcode which was generated:
+
+        [showtagcloud taxomony="category", format="array", number="20", color="#FF5800", background="FFFFFF"]
+
+Since the arguments of the shortcode are the same arguments as the ones of the show_tag_cloud() function, you can then copy them. So in the example above copy the following: taxomony="category", format="array", number="20", color="#FF5800", background="FFFFFF"
+
+Then go to the theme editor and open the file you want to add it in, as an example we'll add it to the category archive of my theme. The code looked like this before my change:
+
+    get_header(); ?>
+        <section id="primary" class="content-area">
+            <div id="content" class="site-content" role="main">
+
+                <?php if ( have_posts() ) : ?>
+
+                <header class="archive-header">
+                    <h1 class="archive-title"><?php printf( __( 'Category Archives: %s', 'twentyfourteen' ), single_cat_title( '', false ) ); ?></h1>
+
+We'll add a call to show_tag_cloud, paste the copied arguments and change the list of arguments to an associative array. Here the resulting code:
+
+    get_header(); ?>
+        <section id="primary" class="content-area">
+            <div id="content" class="site-content" role="main">
+                <?php show_tag_cloud(array( taxomony=>"category", format=>"array", number=>"20", color=>"#FF5800", background=>"FFFFFF" ));?>
+
+                <?php if ( have_posts() ) : ?>
+
+                <header class="archive-header">
+                    <h1 class="archive-title"><?php printf( __( 'Category Archives: %s', 'twentyfourteen' ), single_cat_title( '', false ) ); ?></h1>
+
+Of course if you want to style it differently (e.g. center it and specify a width and height), you can wrap it with a div element with the appropriate style e.g. :
+
+    get_header(); ?>
+        <section id="primary" class="content-area">
+            <div id="content" class="site-content" role="main">
+                <div style="width:600px;height:320px;margin-left:auto;margin-right:auto;">
+                    <?php show_tag_cloud(array( taxomony=>"category", format=>"array", number=>"20", color=>"#FF5800", background=>"FFFFFF" ));?>
+                </div>
+
+                <?php if ( have_posts() ) : ?>
+
+                <header class="archive-header">
+                    <h1 class="archive-title"><?php printf( __( 'Category Archives: %s', 'twentyfourteen' ), single_cat_title( '', false ) ); ?></h1>
+
 
 == Screenshots ==
 
@@ -103,6 +151,11 @@ Use the show_tag_cloud() function. It takes an associative array as parameter. T
 5. Horizontal bars
 
 == Changelog ==
+
+= 0.8.4 =
+
+* Fixed function show_tag_cloud
+* Added css class on div to reflect the chosen visualization type
 
 = 0.8.3 =
 

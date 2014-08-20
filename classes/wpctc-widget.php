@@ -125,7 +125,7 @@ class WPCTC_Widget extends WP_Widget
         ?>
     <div
         id="<?php echo $args['widget_id']; ?>-tagcloud"
-        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo ($instance['format'] == 'rounded') ? "wpctc-rounded" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?> <?php echo (isset($instance['tilt']) && $instance['tilt'] === "1") ? "wpctc-tilt" : ""; ?> <?php echo (isset($instance['colorize']) && $instance['colorize'] === "1") ? "wpctc-colorize" : ""; ?>'>
+        class='wpctc-<?php echo $args['widget_id']; ?> <?php echo ($instance['format'] == 'price') ? "wpctc-tag-links" : ""; ?> <?php echo ($instance['format'] == 'bars') ? "wpctc-bars" : ""; ?> <?php echo ($instance['format'] == 'rounded') ? "wpctc-rounded" : ""; ?> <?php echo (isset($instance['opacity']) && $instance['opacity'] === "1") ? "wpctc-opacity" : ""; ?> <?php echo (isset($instance['tilt']) && $instance['tilt'] === "1") ? "wpctc-tilt" : ""; ?> <?php echo (isset($instance['colorize']) && $instance['colorize'] === "1") ? "wpctc-colorize" : ""; ?> wpctc-<?php echo ($instance['format']); ?>'>
         <?php
         if ($instance['format'] == 'array') {
             $tags = wp_tag_cloud($cloud_args);
