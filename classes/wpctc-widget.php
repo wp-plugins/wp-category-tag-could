@@ -114,7 +114,6 @@ class WPCTC_Widget extends WP_Widget
             'orderby' => $instance['order_by'],
             'order' => $instance['order'],
             'include' => null,
-            'topic_count_text_callback' => default_topic_count_text,
             'link' => 'view',
             'taxonomy' => $instance['taxonomy'],
             'echo' => $instance['format'] != 'array',
