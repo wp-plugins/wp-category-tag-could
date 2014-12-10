@@ -11,7 +11,7 @@ if ( ! class_exists( 'WordPress_Category_Tag_Cloud' ) ) {
 		protected $modules;
 		protected $modified_types = array();
 
-		const VERSION = '0.9';
+		const VERSION = '1.0';
 		const PREFIX = 'wpctc_';
 		const DEBUG_MODE = false;
 
