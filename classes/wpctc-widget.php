@@ -176,7 +176,10 @@ class WPCTC_Widget extends WP_Widget
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
                     data-tagcloud-color="<?php echo $instance['color']; ?>"
                     data-cloud-font=<?php echo !empty($instance['font']) ? '"'.$instance['font'].'"' : "null"; ?>
-                    data-cloud-zoom=<?php echo $instance['zoom']; ?>>
+                    data-cloud-zoom=<?php echo $instance['zoom']; ?>
+                <?php echo isset($instance['width']) && is_numeric($instance['width']) && intval($instance['width']) != 0 ? " width='".$instance['width']."'" : ''; ?>
+                <?php echo isset($instance['height']) && is_numeric($instance['height']) && intval($instance['height']) != 0 ? " height='".$instance['height']."'" : ''; ?>
+                >
             </canvas>
             </div>
             <div id="<?php echo $args['widget_id']; ?>_canvas_tags">
@@ -307,6 +310,8 @@ class WPCTC_Widget extends WP_Widget
         $format = isset($instance['format']) && strlen($instance['format']) > 0 ? $instance['format'] : 'flat';
         $number = isset($instance['number']) && (is_int($instance['number']) || ctype_digit($instance['number'])) ? $instance['number'] : 0;
         $taxonomy = isset($instance['taxonomy']) && strlen($instance['taxonomy']) > 0 ? $instance['taxonomy'] : 'post_tag';
+        $width = isset($instance['width']) && is_numeric($instance['width']) ? $instance['width'] : 0;
+        $height = isset($instance['height']) && is_numeric($instance['height']) ? $instance['height'] : 0;
         $zoom = isset($instance['zoom']) && is_numeric($instance['zoom']) ? $instance['zoom'] : 1;
         $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
         $smallest = isset($instance['smallest']) && (is_int($instance['smallest']) || ctype_digit($instance['smallest'])) ? $instance['smallest'] : 75;
@@ -528,6 +533,20 @@ class WPCTC_Widget extends WP_Widget
         </p>
         <p class="canvas-config">
             <label
+                for="<?php echo $this->get_field_id('width'); ?>"><?php _e('Width:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('width'); ?>"
+                   name="<?php echo $this->get_field_name('width'); ?>" type="text"
+                   value="<?php echo esc_attr($width); ?>"/>
+        </p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('height'); ?>"><?php _e('Height:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('height'); ?>"
+                   name="<?php echo $this->get_field_name('height'); ?>" type="text"
+                   value="<?php echo esc_attr($height); ?>"/>
+        </p>
+        <p class="canvas-config">
+            <label
                 for="<?php echo $this->get_field_id('zoom'); ?>"><?php _e('Initial zoom factor:'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('zoom'); ?>"
                    name="<?php echo $this->get_field_name('zoom'); ?>" type="text"
@@ -669,6 +688,8 @@ class WPCTC_Widget extends WP_Widget
         $instance['format'] = isset($new_instance['format']) && strlen($new_instance['format']) > 0 ? $new_instance['format'] : 'flat';
         $instance['number'] = isset($new_instance['number']) && (is_int($new_instance['number']) || ctype_digit($new_instance['number'])) ? $new_instance['number'] : 0;
         $instance['taxonomy'] = isset($new_instance['taxonomy']) && strlen($new_instance['taxonomy']) > 0 ? $new_instance['taxonomy'] : 'post_tag';
+        $instance['width'] = isset($new_instance['width']) && is_numeric($new_instance['width']) ? $new_instance['width'] : 0;
+        $instance['height'] = isset($new_instance['height']) && is_numeric($new_instance['height']) ? $new_instance['height'] : 0;
         $instance['zoom'] = isset($new_instance['zoom']) && is_numeric($new_instance['zoom']) ? $new_instance['zoom'] : 1;
         $instance['timeout'] = isset($new_instance['timeout']) && is_numeric($new_instance['timeout']) ? $new_instance['timeout'] : 60;
         $instance['smallest'] = isset($new_instance['smallest']) && (is_int($new_instance['smallest']) || ctype_digit($new_instance['smallest'])) ? $new_instance['smallest'] : 75;
