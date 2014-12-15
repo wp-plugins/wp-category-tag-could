@@ -175,6 +175,7 @@ class WPCTC_Widget extends WP_Widget
             ?>
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
                     data-tagcloud-color="<?php echo $instance['color']; ?>"
+                    data-cloud-font=<?php echo !empty($instance['font']) ? '"'.$instance['font'].'"' : "null"; ?>
                     data-cloud-zoom=<?php echo $instance['zoom']; ?>>
             </canvas>
             </div>
@@ -291,6 +292,7 @@ class WPCTC_Widget extends WP_Widget
     )
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
+        $font = (!empty($instance['font'])) ? strip_tags($instance['font']) : '';
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
         $child_categories = isset($instance['child_categories']) ? $instance['child_categories'] : "0";
         $opacity = isset($instance['opacity']) ? $instance['opacity'] : "0";
@@ -531,6 +533,13 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('zoom'); ?>" type="text"
                    value="<?php echo esc_attr($zoom); ?>"/>
         </p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('font'); ?>"><?php _e('Font family:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('font'); ?>"
+                   name="<?php echo $this->get_field_name('font'); ?>" type="text"
+                   value="<?php echo esc_attr($font); ?>"/>
+        </p>
         <p class="cloud-non-price">
             <label
                 for="<?php echo $this->get_field_id('smallest'); ?>"><?php _e('Size of the smallest item (in %):'); ?></label>
@@ -639,6 +648,7 @@ class WPCTC_Widget extends WP_Widget
     {
         $instance = array();
         $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
+        $instance['font'] = (!empty($new_instance['font'])) ? strip_tags($new_instance['font']) : '';
         $custom_taxonomies = get_taxonomies(array('public' => true, '_builtin' => false), 'objects', 'and');
         if ($custom_taxonomies) {
             foreach ($custom_taxonomies as $custom_taxonomy) {

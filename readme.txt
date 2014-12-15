@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 4.0.1
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -151,6 +151,10 @@ Of course if you want to style it differently (e.g. center it and specify a widt
 5. Horizontal bars
 
 == Changelog ==
+
+= 1.1 =
+
+* Support for defining the font family used to render the terms in the 3D cloud
 
 = 1.0 =
 

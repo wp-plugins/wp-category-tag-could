@@ -18,9 +18,11 @@ function wpctcWrapper($) {
             wpctc.registerEventHandlers();
             $('.tagcloud-canvas').each(function () {
                 $color = $(this).attr('data-tagcloud-color');
+                $font = $(this).attr("data-cloud-font");
+                if ($font == "null") $font=null;
                 $(this).tagcanvas({
                     outlineThickness: 0,
-                    textFont: null,
+                    textFont: $font,
                     textColour: $color,
                     maxSpeed: 0.06,
                     minBrightness: 0.1,
