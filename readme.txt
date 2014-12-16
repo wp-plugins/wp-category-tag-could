@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 4.0.1
-Stable tag: 1.2
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,11 @@ You can also choose to only consider posts with specific categories (with or wit
 
 If you do not want to display the cloud as a side bar widget but in the content of a page or post, you can use the short code (see the frequently asked questions). You can also use a PHP function to have the cloud displayed. More details also in the frequently asked section.
 
+**Note that in version 1.3, the logic to filter displayed terms was changed:**
+
+* up to version 1.2: If categories were displayed and you selected category A and B but there was a post with category B and C, category C was also displayed.
+* from version 1.3: If categories are displayed and you select category A and B but there was a post with category B and C, category C will NOT be displayed.
+
 == Installation ==
 
 1. Upload the folder `wp-category-tag-could` to the `/wp-content/plugins/`
@@ -68,6 +73,7 @@ Syntax: [showtagcloud options...]
 Options:
 
 * taxonomy: the taxonomy to be displayed e.g. post_tag, category...
+* exclude: comma separated list of term IDs not to be displayed
 * number: max number of terms to be displayed
 * order_by: field by which to sort the terms in the tag. Should be "name" or "count"
 * order: how to sort. Should be ASC, DESC or RAND (resp. ascending, descending or random)
@@ -81,6 +87,8 @@ Options:
 * nofollow: set to 1 to make all link nofollow
 * cache: set to 1 to cache the rendering of the cloud
 * timeout: the cache timeout in seconds
+* width: width of the 3D canvas. 0 means no specific width set. Use this to define the size of the generated canvas (to prevent pixelization due to stretching)
+* height: height of the 3D canvas. 0 means no specific height set. Use this to define the size of the generated canvas (to prevent pixelization due to stretching)
 * zoom: initial zoom factor e.g. 1
 * smallest: smallest font size in percent of the default font size e.g. 75
 * largest: largest font size in percent of the default font size e.g. 200
@@ -151,6 +159,11 @@ Of course if you want to style it differently (e.g. center it and specify a widt
 5. Horizontal bars
 
 == Changelog ==
+
+= 1.3 =
+
+* Added exclude list which contains a comma-separated list of term IDs (numbers) e.g. 1,3,7 which will not be displayed.
+* If taxonomy X is selected and a filter is configured for this taxonomy X, the non-selected terms will not be displayed anymore even if there are posts with this term and one of the selected ones.
 
 = 1.2 =
 

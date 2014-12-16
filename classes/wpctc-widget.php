@@ -66,6 +66,41 @@ class WPCTC_Widget extends WP_Widget
         return $category_list;
     }
 
+
+    /**
+     * @param $options settings for this plugin
+     * @return array
+     */
+    private function get_exclude_array($exclude)
+    {
+        $exclude_array = array();
+
+        foreach (explode(',', $exclude) as $id) {
+            if ($id != "") {
+                array_push($exclude_array, $id);
+            }
+        }
+        return $exclude_array;
+    }
+
+    /**
+     * Converts any array to an array of ints by converting each element in the array to an int.
+     *
+     * @param $array_in array to be converted
+     * @return array converted array
+     */
+    private function to_int_array($array_in)
+    {
+        $array_out = array();
+
+        if (isset($array_in) && is_array($array_in)) {
+            foreach ($array_in as $id) {
+                array_push($array_out, intval($id));
+            }
+        }
+        return $array_out;
+    }
+
     /**
      * @param array $args
      * @param array $instance
@@ -82,8 +117,6 @@ class WPCTC_Widget extends WP_Widget
             $wp_ctc_cache = get_option($cache_id, array("", 0, ""));
             if ($wp_ctc_cache[1] > $current_time && $wp_ctc_cache[2] == $md5) {
                 echo $wp_ctc_cache[0];
-                error_log("Returning cached widget: " . $cache_id . "(" . $md5 . ")");
-
                 return;
             }
         }
@@ -139,15 +172,32 @@ class WPCTC_Widget extends WP_Widget
                 AND tt2.taxonomy = '" . $instance['taxonomy'] . "' " .
             $where);
 
+        $exclude = array();
+
+        if (!empty($instance['exclude'])) {
+            $exclude = $this->to_int_array($this->get_exclude_array($instance['exclude']));
+        }
+        error_log("exclude=".print_r($instance['exclude'], true));
+        error_log("exclude=".print_r($exclude, true));
+
         $includeTags = '';
         if (count($tags) > 0) {
             foreach ($tags as $tag) {
-                if (count($instance['tag_id']) > 0 && !in_array($tag->tag_id, $instance['tag_id'])) {
+                if ($instance['taxonomy'] == 'post_tag' && count($instance['tag_id']) > 0 && !in_array($tag->tag_id, $instance['tag_id'])) {
                     continue;
                 }
-                $includeTags = $tag->tag_id . ',' . $includeTags;
+                if (isset($instance[$instance['taxonomy'] + '_id'])
+                    && count($instance[$instance['taxonomy'] + '_id']) > 0
+                    && !in_array($tag->tag_id, $instance[$instance['taxonomy'] + '_id'])
+                ) {
+                    continue;
+                }
+                if (!in_array($tag->tag_id, $exclude)) {
+                    $includeTags = $tag->tag_id . ',' . $includeTags;
+                }
             }
         }
+
         $cloud_args = array(
             'smallest' => $instance['format'] == 'price' ? '100' : $instance['smallest'],
             'largest' => $instance['format'] == 'price' ? '100' : $instance['largest'],
@@ -164,7 +214,8 @@ class WPCTC_Widget extends WP_Widget
         if (strlen($includeTags > 0)) {
             $cloud_args['include'] = $includeTags;
         }
-        error_log("cloud_args=" . print_r($cloud_args, true));
+
+        error_log("cloud_args=".print_r($cloud_args, true));
         ?>
     <div
         id="<?php echo $args['widget_id']; ?>-tagcloud"
@@ -280,7 +331,6 @@ class WPCTC_Widget extends WP_Widget
         if (isset($instance['cache']) && $instance['cache'] === "1") {
             $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
             update_option($cache_id, array($output, $current_time + $timeout, $md5));
-            error_log("Caching widget for " . $timeout . " seconds: " . $cache_id . "(" . $md5 . ")");
         }
 
         echo $output;
@@ -295,6 +345,7 @@ class WPCTC_Widget extends WP_Widget
     )
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
+        $exclude = (!empty($instance['exclude'])) ? strip_tags($instance['exclude']) : '';
         $font = (!empty($instance['font'])) ? strip_tags($instance['font']) : '';
         $category_id = isset($instance['category_id']) ? $instance['category_id'] : array();
         $child_categories = isset($instance['child_categories']) ? $instance['child_categories'] : "0";
@@ -351,6 +402,12 @@ class WPCTC_Widget extends WP_Widget
             </select>
         </p>
         <p>
+            <label for="<?php echo $this->get_field_id('exclude'); ?>"><?php _e('Exclude:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('exclude'); ?>"
+                   name="<?php echo $this->get_field_name('exclude'); ?>" type="text"
+                   value="<?php echo esc_attr($exclude); ?>"/>
+        </p>
+        <p>
             <label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Max displayed items:'); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id('number'); ?>"
                    name="<?php echo $this->get_field_name('number'); ?>" type="text"
@@ -365,7 +422,6 @@ class WPCTC_Widget extends WP_Widget
                     style="height: auto;">
                 <?php
                 $post_types = get_post_types('', 'objects');
-                error_log(print_r($post_types, true));
                 if ($post_types) {
                     foreach ($post_types as $name => $type) {
                         $label = esc_html($type->label);
@@ -667,6 +723,7 @@ class WPCTC_Widget extends WP_Widget
     {
         $instance = array();
         $instance['title'] = (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : __('New title', 'wpctc_widget_domain');
+        $instance['exclude'] = (!empty($new_instance['exclude'])) ? strip_tags($new_instance['exclude']) : '';
         $instance['font'] = (!empty($new_instance['font'])) ? strip_tags($new_instance['font']) : '';
         $custom_taxonomies = get_taxonomies(array('public' => true, '_builtin' => false), 'objects', 'and');
         if ($custom_taxonomies) {
