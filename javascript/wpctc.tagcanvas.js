@@ -19,11 +19,17 @@ function wpctcWrapper($) {
             $('.tagcloud-canvas').each(function () {
                 $color = $(this).attr('data-tagcloud-color');
                 $font = $(this).attr("data-cloud-font");
+                $radiusx = $(this).attr("data-cloud-radiusx");
+                $radiusy = $(this).attr("data-cloud-radiusy");
+                $radiusz = $(this).attr("data-cloud-radiusz");
                 if ($font == "null") $font=null;
                 $(this).tagcanvas({
                     outlineThickness: 0,
                     textFont: $font,
                     textColour: $color,
+                    radiusx: $radiusx,
+                    radiusy: $radiusy,
+                    radiusz: $radiusz,
                     maxSpeed: 0.06,
                     minBrightness: 0.1,
                     depth: 0.95,

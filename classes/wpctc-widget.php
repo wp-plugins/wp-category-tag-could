@@ -161,7 +161,18 @@ class WPCTC_Widget extends WP_Widget
         if (isset($instance['post_type']) && count($instance['post_type']) > 0) {
             $where = $where . " AND posts.post_type IN ('" . implode("','", $instance['post_type']) . "') ";
         }
+        if (isset($instance['author']) && count($instance['author']) > 0) {
+            $where = $where . " AND posts.post_author IN ('" . implode("','", $instance['author']) . "') ";
+        }
 
+        if (isset($instance['post_age']) && (is_int($instance['post_age']) || ctype_digit($instance['post_age'])) && intval($instance['post_age']) > 0) {
+            $where = $where . " AND posts.post_date > '".date('Y-m-d', strtotime('-' . intval($instance['post_age']) . ' days'))."'";
+        }
+
+        if (isset($instance['post_count']) && (is_int($instance['post_count']) || ctype_digit($instance['post_count'])) && intval($instance['post_count']) > 0) {
+            $where = $where . " GROUP BY tag_id HAVING count(distinct posts.ID) >= ".intval($instance['post_count']);
+        }
+        
         $tags = $wpdb->get_results
         (" SELECT DISTINCT tt2.term_id AS tag_id
 			FROM $wpdb->posts as posts " .
@@ -177,8 +188,6 @@ class WPCTC_Widget extends WP_Widget
         if (!empty($instance['exclude'])) {
             $exclude = $this->to_int_array($this->get_exclude_array($instance['exclude']));
         }
-        error_log("exclude=".print_r($instance['exclude'], true));
-        error_log("exclude=".print_r($exclude, true));
 
         $includeTags = '';
         if (count($tags) > 0) {
@@ -214,8 +223,6 @@ class WPCTC_Widget extends WP_Widget
         if (strlen($includeTags > 0)) {
             $cloud_args['include'] = $includeTags;
         }
-
-        error_log("cloud_args=".print_r($cloud_args, true));
         ?>
     <div
         id="<?php echo $args['widget_id']; ?>-tagcloud"
@@ -227,6 +234,9 @@ class WPCTC_Widget extends WP_Widget
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
                     data-tagcloud-color="<?php echo $instance['color']; ?>"
                     data-cloud-font=<?php echo !empty($instance['font']) ? '"'.$instance['font'].'"' : "null"; ?>
+                    data-cloud-radiusx=<?php echo !empty($instance['radiusx']) ? '"'.$instance['radiusx'].'"' : "1"; ?>
+                    data-cloud-radiusy=<?php echo !empty($instance['radiusy']) ? '"'.$instance['radiusy'].'"' : "1"; ?>
+                    data-cloud-radiusz=<?php echo !empty($instance['radiusz']) ? '"'.$instance['radiusz'].'"' : "1"; ?>
                     data-cloud-zoom=<?php echo $instance['zoom']; ?>
                 <?php echo isset($instance['width']) && is_numeric($instance['width']) && intval($instance['width']) != 0 ? " width='".$instance['width']."'" : ''; ?>
                 <?php echo isset($instance['height']) && is_numeric($instance['height']) && intval($instance['height']) != 0 ? " height='".$instance['height']."'" : ''; ?>
@@ -355,14 +365,20 @@ class WPCTC_Widget extends WP_Widget
         $cache = isset($instance['cache']) ? $instance['cache'] : "0";
         $nofollow = isset($instance['nofollow']) ? $instance['nofollow'] : "0";
         $post_type = isset($instance['post_type']) ? $instance['post_type'] : array();
+        $author = isset($instance['author']) ? $instance['author'] : array();
         $tag_id = isset($instance['tag_id']) ? $instance['tag_id'] : array();
         $order_by = isset($instance['order_by']) && strlen($instance['order_by']) > 0 ? $instance['order_by'] : 'name';
         $order = isset($instance['order']) && strlen($instance['order']) > 0 ? $instance['order'] : 'ASC';
         $format = isset($instance['format']) && strlen($instance['format']) > 0 ? $instance['format'] : 'flat';
         $number = isset($instance['number']) && (is_int($instance['number']) || ctype_digit($instance['number'])) ? $instance['number'] : 0;
+        $post_age = isset($instance['post_age']) && (is_int($instance['post_age']) || ctype_digit($instance['post_age'])) ? $instance['post_age'] : 0;
+        $post_count = isset($instance['post_count']) && (is_int($instance['post_count']) || ctype_digit($instance['post_count'])) ? $instance['post_count'] : 0;
         $taxonomy = isset($instance['taxonomy']) && strlen($instance['taxonomy']) > 0 ? $instance['taxonomy'] : 'post_tag';
         $width = isset($instance['width']) && is_numeric($instance['width']) ? $instance['width'] : 0;
         $height = isset($instance['height']) && is_numeric($instance['height']) ? $instance['height'] : 0;
+        $radiusx = isset($instance['radiusx']) ? $instance['radiusx'] : '1';
+        $radiusy = isset($instance['radiusy']) ? $instance['radiusy'] : '1';
+        $radiusz = isset($instance['radiusz']) ? $instance['radiusz'] : '1';
         $zoom = isset($instance['zoom']) && is_numeric($instance['zoom']) ? $instance['zoom'] : 1;
         $timeout = isset($instance['timeout']) && is_numeric($instance['timeout']) ? $instance['timeout'] : 60;
         $smallest = isset($instance['smallest']) && (is_int($instance['smallest']) || ctype_digit($instance['smallest'])) ? $instance['smallest'] : 75;
@@ -406,6 +422,7 @@ class WPCTC_Widget extends WP_Widget
             <input class="widefat" id="<?php echo $this->get_field_id('exclude'); ?>"
                    name="<?php echo $this->get_field_name('exclude'); ?>" type="text"
                    value="<?php echo esc_attr($exclude); ?>"/>
+            <small><em><?php _e('comma separated list of term IDs'); ?></em></small>
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('number'); ?>"><?php _e('Max displayed items:'); ?></label>
@@ -413,6 +430,50 @@ class WPCTC_Widget extends WP_Widget
                    name="<?php echo $this->get_field_name('number'); ?>" type="text"
                    value="<?php echo esc_attr($number); ?>"/>
             <small><em><?php _e('0 means display all'); ?></em></small>
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('post_age'); ?>"><?php _e('Max post age in days:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('post_age'); ?>"
+                   name="<?php echo $this->get_field_name('post_age'); ?>" type="text"
+                   value="<?php echo esc_attr($post_age); ?>"/>
+            <small><em><?php _e('0 means display all'); ?></em></small>
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('post_count'); ?>"><?php _e('Min number of posts:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('post_count'); ?>"
+                   name="<?php echo $this->get_field_name('post_count'); ?>" type="text"
+                   value="<?php echo esc_attr($post_count); ?>"/>
+            <small><em><?php _e('0 returns the same as 1'); ?></em></small>
+        </p>
+        <p>
+            <label for="<?php echo $this->get_field_id('author'); ?>"><?php _e('Post authors:'); ?></label><br/>
+            <select id="<?php echo $this->get_field_id('author'); ?>"
+                    name="<?php echo $this->get_field_name('author'); ?>[]" size=3 multiple="multiple"
+                    class="widefat"
+                    style="height: auto;">
+                <?php
+                $allUsers = get_users('orderby=post_count&order=DESC');
+                $authors = array();
+                // Remove subscribers from the list as they won't write any articles
+                foreach ($allUsers as $currentUser) {
+                    if (!in_array('subscriber', $currentUser->roles)) {
+                        $authors[] = $currentUser;
+                    }
+                }
+                if ($authors) {
+                    foreach ($authors as $aut) {
+                        $label = esc_html($aut->display_name);
+                        ?>
+                        <option value="<?php echo($aut->ID); ?>"
+                        <?php
+                        if (in_array($aut->ID, $author)) {
+                            echo("selected='selected'");
+                        }
+                       echo ">$label</option>";
+                    }
+                }
+                ?>
+            </select>
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('post_type'); ?>"><?php _e('Post types:'); ?></label><br/>
@@ -593,6 +654,7 @@ class WPCTC_Widget extends WP_Widget
             <input class="widefat" id="<?php echo $this->get_field_id('width'); ?>"
                    name="<?php echo $this->get_field_name('width'); ?>" type="text"
                    value="<?php echo esc_attr($width); ?>"/>
+            <small><em><?php _e('width of the containing canvas in pixels'); ?></em></small>
         </p>
         <p class="canvas-config">
             <label
@@ -600,6 +662,31 @@ class WPCTC_Widget extends WP_Widget
             <input class="widefat" id="<?php echo $this->get_field_id('height'); ?>"
                    name="<?php echo $this->get_field_name('height'); ?>" type="text"
                    value="<?php echo esc_attr($height); ?>"/>
+            <small><em><?php _e('height of the containing canvas in pixels'); ?></em></small>
+        </p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('radiusx'); ?>"><?php _e('Radius X:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('radiusx'); ?>"
+                   name="<?php echo $this->get_field_name('radiusx'); ?>" type="text"
+                   value="<?php echo esc_attr($radiusx); ?>"/>
+            <small><em><?php _e('Initial size of cloud from centre to sides'); ?></em></small>
+        </p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('radiusy'); ?>"><?php _e('Radius Y:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('radiusy'); ?>"
+                   name="<?php echo $this->get_field_name('radiusy'); ?>" type="text"
+                   value="<?php echo esc_attr($radiusy); ?>"/>
+            <small><em><?php _e('Initial size of cloud from centre to top and bottom'); ?></em></small>
+        </p>
+        <p class="canvas-config">
+            <label
+                for="<?php echo $this->get_field_id('radiusz'); ?>"><?php _e('Radius Z:'); ?></label>
+            <input class="widefat" id="<?php echo $this->get_field_id('radiusz'); ?>"
+                   name="<?php echo $this->get_field_name('radiusz'); ?>" type="text"
+                   value="<?php echo esc_attr($radiusz); ?>"/>
+            <small><em><?php _e('Initial size of cloud from centre to front and back'); ?></em></small>
         </p>
         <p class="canvas-config">
             <label
@@ -732,6 +819,7 @@ class WPCTC_Widget extends WP_Widget
             }
         }
         $instance['post_type'] = isset($new_instance['post_type']) ? $new_instance['post_type'] : array();
+        $instance['author'] = isset($new_instance['author']) ? $new_instance['author'] : array();
         $instance['category_id'] = isset($new_instance['category_id']) ? $new_instance['category_id'] : array();
         $instance['child_categories'] = isset($new_instance['child_categories']) ? $new_instance['child_categories'] : "0";
         $instance['opacity'] = isset($new_instance['opacity']) ? $new_instance['opacity'] : "0";
@@ -744,9 +832,14 @@ class WPCTC_Widget extends WP_Widget
         $instance['order'] = isset($new_instance['order']) && strlen($new_instance['order']) > 0 ? $new_instance['order'] : 'ASC';
         $instance['format'] = isset($new_instance['format']) && strlen($new_instance['format']) > 0 ? $new_instance['format'] : 'flat';
         $instance['number'] = isset($new_instance['number']) && (is_int($new_instance['number']) || ctype_digit($new_instance['number'])) ? $new_instance['number'] : 0;
+        $instance['post_age'] = isset($new_instance['post_age']) && (is_int($new_instance['post_age']) || ctype_digit($new_instance['post_age'])) ? $new_instance['post_age'] : 0;
+        $instance['post_count'] = isset($new_instance['post_count']) && (is_int($new_instance['post_count']) || ctype_digit($new_instance['post_count'])) ? $new_instance['post_count'] : 0;
         $instance['taxonomy'] = isset($new_instance['taxonomy']) && strlen($new_instance['taxonomy']) > 0 ? $new_instance['taxonomy'] : 'post_tag';
         $instance['width'] = isset($new_instance['width']) && is_numeric($new_instance['width']) ? $new_instance['width'] : 0;
         $instance['height'] = isset($new_instance['height']) && is_numeric($new_instance['height']) ? $new_instance['height'] : 0;
+        $instance['radiusx'] = isset($new_instance['radiusx']) ? $new_instance['radiusx'] : '1';
+        $instance['radiusy'] = isset($new_instance['radiusy']) ? $new_instance['radiusy'] : '1';
+        $instance['radiusz'] = isset($new_instance['radiusz']) ? $new_instance['radiusz'] : '1';
         $instance['zoom'] = isset($new_instance['zoom']) && is_numeric($new_instance['zoom']) ? $new_instance['zoom'] : 1;
         $instance['timeout'] = isset($new_instance['timeout']) && is_numeric($new_instance['timeout']) ? $new_instance['timeout'] : 60;
         $instance['smallest'] = isset($new_instance['smallest']) && (is_int($new_instance['smallest']) || ctype_digit($new_instance['smallest'])) ? $new_instance['smallest'] : 75;

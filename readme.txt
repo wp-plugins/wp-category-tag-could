@@ -4,7 +4,7 @@ Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
 Tested up to: 4.0.1
-Stable tag: 1.3
+Stable tag: 1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -159,6 +159,13 @@ Of course if you want to style it differently (e.g. center it and specify a widt
 5. Horizontal bars
 
 == Changelog ==
+
+= 1.4 =
+
+* Filter by post author
+* Limit to terms with posts written in the last X days (Max post age). 0 means do not limit to newer posts.
+* Limit to terms with a minimum number of posts. 0 returns the same terms as 1.
+* Possibility to define the X, Y and Z radius for the 3D cloud.
 
 = 1.3 =
 
