@@ -233,6 +233,7 @@ class WPCTC_Widget extends WP_Widget
             ?>
             <canvas id="<?php echo $args['widget_id']; ?>_canvas" class="tagcloud-canvas"
                     data-tagcloud-color="<?php echo $instance['color']; ?>"
+                    data-tagcloud-bordercolor="<?php echo !empty($instance['border']) ? $instance['border'] : "#ffff99"; ?>"
                     data-cloud-font=<?php echo !empty($instance['font']) ? '"'.$instance['font'].'"' : "null"; ?>
                     data-cloud-radiusx=<?php echo !empty($instance['radiusx']) ? '"'.$instance['radiusx'].'"' : "1"; ?>
                     data-cloud-radiusy=<?php echo !empty($instance['radiusy']) ? '"'.$instance['radiusy'].'"' : "1"; ?>

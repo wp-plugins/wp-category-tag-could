@@ -3,8 +3,8 @@ Contributors: benohead, amazingweb-gmbh
 Donate link: http://benohead.com/donate/
 Tags: 3d, cat, category, categories, cloud, configurable, cumulus, html5, javascript, sphere, tag, tags, tag-cloud, taxonomy, widget
 Requires at least: 3.0.1
-Tested up to: 4.0.1
-Stable tag: 1.4
+Tested up to: 4.1
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -159,6 +159,10 @@ Of course if you want to style it differently (e.g. center it and specify a widt
 5. Horizontal bars
 
 == Changelog ==
+
+= 1.5 =
+
+* The outline color in the 3D cloud is now configurable using the setting "Border Color".
 
 = 1.4 =
 
