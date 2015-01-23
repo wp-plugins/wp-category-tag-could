@@ -8,7 +8,6 @@
  */
 class WPCTC_Widget extends WP_Widget
 {
-
     /**
      *
      */
@@ -66,7 +65,6 @@ class WPCTC_Widget extends WP_Widget
         return $category_list;
     }
 
-
     /**
      * @param $options settings for this plugin
      * @return array
@@ -108,6 +106,16 @@ class WPCTC_Widget extends WP_Widget
     public function widget($args, $instance)
     {
         global $wpdb;
+
+        if (isset(WPCTC_Settings::get_instance()->settings['general'])
+            && isset(WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'])
+            && WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'] == 1) {
+            wp_enqueue_style( $GLOBALS['wpctc']::PREFIX . 'wpctc');
+            wp_enqueue_script( $GLOBALS['wpctc']::PREFIX . 'jquery-tagcanvas');
+            wp_enqueue_script( $GLOBALS['wpctc']::PREFIX . 'wpctc-tagcanvas');
+            wp_enqueue_script( $GLOBALS['wpctc']::PREFIX . 'jquery-style');
+            wp_enqueue_script( $GLOBALS['wpctc']::PREFIX . 'wp-category-tag-cloud');
+        }
 
         $md5 = md5(print_r(array_merge($args, $instance), true));
         $cache_id = 'wp_ctc_cache_' . $args['widget_id'];
@@ -350,10 +358,7 @@ class WPCTC_Widget extends WP_Widget
     /**
      * @param array $instance
      */
-    public
-    function form(
-        $instance
-    )
+    public function form($instance)
     {
         $title = (!empty($instance['title'])) ? strip_tags($instance['title']) : '';
         $exclude = (!empty($instance['exclude'])) ? strip_tags($instance['exclude']) : '';
@@ -860,6 +865,13 @@ class WPCTC_Widget extends WP_Widget
             $border = '';
         }
         $instance['border'] = $border;
+
+        if (isset(WPCTC_Settings::get_instance()->settings)
+            && isset(WPCTC_Settings::get_instance()->settings['general'])
+            && isset(WPCTC_Settings::get_instance()->settings['general']['clear-cache-on-save'])
+            && WPCTC_Settings::get_instance()->settings['general']['clear-cache-on-save'] == 1) {
+            WordPress_Category_Tag_Cloud::clear_caching_plugins();
+        }
 
         return $instance;
     }

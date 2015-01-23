@@ -11,7 +11,7 @@ if ( ! class_exists( 'WordPress_Category_Tag_Cloud' ) ) {
 		protected $modules;
 		protected $modified_types = array();
 
-		const VERSION = '1.5';
+		const VERSION = '1.6';
 		const PREFIX = 'wpctc_';
 		const DEBUG_MODE = false;
 
@@ -91,16 +91,23 @@ if ( ! class_exists( 'WordPress_Category_Tag_Cloud' ) ) {
 				'all'
 			);
 
+			error_log("bla=".print_r(WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'], true));
+			error_log("bla=".(!isset(WPCTC_Settings::get_instance()->settings['general']) ? "true" : "false"));
+			error_log("bla=".(!isset(WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts']) ? "true" : "false"));
+			error_log("bla=".(WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'] != 1 ? "true" : "false"));
+
 			if ( is_admin() ) {
 				wp_enqueue_style( 'farbtastic' );
 				wp_enqueue_script( 'farbtastic' );
 				wp_enqueue_script( self::PREFIX . 'wp-category-tag-cloud-admin' );
-			} else {
-				wp_enqueue_style( self::PREFIX . 'wpctc' );
-				wp_enqueue_script( self::PREFIX . 'jquery-tagcanvas' );
-				wp_enqueue_script( self::PREFIX . 'wpctc-tagcanvas' );
-				wp_enqueue_script( self::PREFIX . 'jquery-style' );
-				wp_enqueue_script( self::PREFIX . 'wp-category-tag-cloud' );
+			} elseif (!isset(WPCTC_Settings::get_instance()->settings['general'])
+				|| !isset(WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'])
+				|| WPCTC_Settings::get_instance()->settings['general']['do-not-load-scripts'] != 1) {
+				wp_enqueue_style(self::PREFIX . 'wpctc');
+				wp_enqueue_script(self::PREFIX . 'jquery-tagcanvas');
+				wp_enqueue_script(self::PREFIX . 'wpctc-tagcanvas');
+				wp_enqueue_script(self::PREFIX . 'jquery-style');
+				wp_enqueue_script(self::PREFIX . 'wp-category-tag-cloud');
 			}
 		}
 
@@ -109,7 +116,7 @@ if ( ! class_exists( 'WordPress_Category_Tag_Cloud' ) ) {
 		 *
 		 * @mvc Model
 		 */
-		protected static function clear_caching_plugins() {
+		public static function clear_caching_plugins() {
 			// WP Super Cache
 			if ( function_exists( 'wp_cache_clear_cache' ) ) {
 				wp_cache_clear_cache();
@@ -118,13 +125,19 @@ if ( ! class_exists( 'WordPress_Category_Tag_Cloud' ) ) {
 			// W3 Total Cache
 			if ( class_exists( 'W3_Plugin_TotalCacheAdmin' ) ) {
 				$w3_total_cache = w3_instance( 'W3_Plugin_TotalCacheAdmin' );
-
 				if ( method_exists( $w3_total_cache, 'flush_all' ) ) {
 					$w3_total_cache->flush_all();
 				}
 			}
-		}
 
+			//Hyper Cache
+			if ( class_exists( 'HyperCache')) {
+				$hyper_cache = HyperCache::$instance;
+				if ( method_exists( $hyper_cache, 'flush_all' ) ) {
+					$hyper_cache->remove_dir($hyper_cache->get_folder() . '');
+				}
+			}
+		}
 
 		/*
 		 * Instance methods
