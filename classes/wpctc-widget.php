@@ -203,9 +203,9 @@ class WPCTC_Widget extends WP_Widget
                 if ($instance['taxonomy'] == 'post_tag' && count($instance['tag_id']) > 0 && !in_array($tag->tag_id, $instance['tag_id'])) {
                     continue;
                 }
-                if (isset($instance[$instance['taxonomy'] + '_id'])
-                    && count($instance[$instance['taxonomy'] + '_id']) > 0
-                    && !in_array($tag->tag_id, $instance[$instance['taxonomy'] + '_id'])
+                if (isset($instance[$instance['taxonomy'] . '_id'])
+                    && count($instance[$instance['taxonomy'] . '_id']) > 0
+                    && !in_array($tag->tag_id, $instance[$instance['taxonomy'] . '_id'])
                 ) {
                     continue;
                 }
